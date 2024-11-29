@@ -30,9 +30,10 @@ class Event {
     
   });
 
-  // Récupération de tous les événements depuis la base de données
+  // Récupération de tous les événements depuis la base de données elt à envoyer : id, name, event_date, location, tickets_nbr
   static Future<List<Event>> getAll() async {
-    final data = await Supabase.instance.client.from('Events').select('id, name, eventDate, location');
+    final data = await Supabase.instance.client.from('Events').select('*');
+    print(data);
     return data.map((event) => Event.fromJson(event)).toList();
   }
 
