@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
+import 'package:ticket_flutter/utils.dart';
 import 'supabaseConnection.dart'; // Assurez-vous que ce fichier contient la configuration de Supabase
 import 'event.dart';             // Importez le modèle Event avec la fonction getAll
 
@@ -41,9 +42,9 @@ class _EventListPageState extends State<EventListPage> {
               itemBuilder: (context, index) {
                 final event = events[index];
                 return ListTile(
-                  title: Text(event.location),
+                  title: Text('${event.name} - ${event.location}'),
                   subtitle: Text(
-                    'Date: ${event.eventDate.toLocal()} \n'
+                    'Date: ${parseDate(event.eventDate)} \n'
                     'Tickets: ${event.ticketsNbr} \n'
                   ),
                   isThreeLine: true,
@@ -56,3 +57,4 @@ class _EventListPageState extends State<EventListPage> {
     );
   }
 }
+ */
