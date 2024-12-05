@@ -1,0 +1,15 @@
+import 'package:flutter/material.dart';
+
+class EventInfos extends StatelessWidget {
+  final int eventId;
+
+  const EventInfos({super.key, required this.eventId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Détails de l\'événement #$eventId')),
+      body: Center(child: Text('Infos détaillées pour l\'événement $eventId')),
+    );
+  }
+}
