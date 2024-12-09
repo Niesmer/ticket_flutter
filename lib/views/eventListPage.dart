@@ -60,7 +60,12 @@ class _EventListPageState extends State<EventListPage> {
         onPressed: () async {
           final added = await showDialog(
             context: context,
-            builder: (context) => EventForm(),
+            builder: (context) => Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: EventForm(),
+      ),
+            ),
           );
           if (added == true) _refreshEvents(); // Refresh if event was added
         },
