@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ticket_flutter/supabase.dart';
 
 class LoginSignup extends StatefulWidget {
+  const LoginSignup({super.key});
+
   @override
   _LoginSignupState createState() => _LoginSignupState();
 }
@@ -21,11 +23,14 @@ class _LoginSignupState extends State<LoginSignup> {
     });
   }
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       // Perform login or signup logic here
-      SupaConnect().signUp(_email, _password, _pseudo, _nom, _prenom);
+      if (_isLogin) {
+        return await SupaConnect().signIn(_email, _password);
+      }
+      return await SupaConnect().signUp(_email, _password, _pseudo, _nom, _prenom);
     }
   }
 
@@ -111,7 +116,8 @@ class _LoginSignupState extends State<LoginSignup> {
               ),
               TextButton(
                 onPressed: _toggleFormMode,
-                child: Text(_isLogin ? 'Create an account' : 'Have an account? Login'),
+                child: Text(
+                    _isLogin ? 'Create an account' : 'Have an account? Login'),
               ),
             ],
           ),

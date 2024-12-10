@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserProfile {
@@ -46,43 +48,29 @@ class SupaConnect {
       String prenom) async {
     try {
       // Step 1: Sign up the user with email and password
-      final response = await client.auth.signUp(
-        email: email,
-        password: password,
-      );
+      final response = await client.auth
+          .signUp(email: email, password: password, data: {'name': nom, 'firstname': prenom, 'pseudo': pseudo});
 
       // Ensure user is created successfully
       final user = response.user;
-      final session = response.session;
-
-      print(session);
-      print(user);
       if (user == null) {
         throw Exception('User creation failed');
       }
-
-      // Step 2: Add user profile to the profiles table
-      await client.from('Profiles').insert({
-        'id': user.id, // Use the user ID from Supabase Auth
-        'pseudo': pseudo,
-        'nom': nom,
-        'prenom': prenom,
-        'liked_events_id': [], // Default value for likedIds
-        'role': 0, // Default value for role
-      });
     } catch (error) {
       throw Exception('Sign-up failed: ${error.toString()}');
     }
   }
 
   Future<UserProfile> getUser() async {
-    final user = client.auth.currentUser;
+    var user = client.auth.currentUser;
+    print(user);
+    print(client.auth.currentSession);
     if (user == null) {
       throw Exception('No user signed in');
     }
 
     final response =
-        await client.from('profiles').select().eq('id', user.id).single();
+        await client.from('Profiles').select().eq('id', user.id).single();
 
     final data = response;
     return UserProfile(
