@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ticket_flutter/event.dart';
-import 'package:ticket_flutter/views/eventForm.dart';
-import 'package:ticket_flutter/views/eventListRow.dart';
-import 'package:ticket_flutter/utils.dart';
+import 'package:ticket_flutter/supabase.dart';
+import './eventForm.dart';
+import './eventListRow.dart';
 
 class EventListPage extends StatefulWidget {
   const EventListPage({super.key});

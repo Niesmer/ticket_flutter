@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ticket_flutter/Views/HomeView.dart';
 import 'package:ticket_flutter/Views/LoginView.dart';
 import 'package:ticket_flutter/Views/ProfileView.dart';
+import 'package:ticket_flutter/components/events/eventListPage.dart';
 import 'package:ticket_flutter/supabase.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -31,6 +32,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/profil',
           builder: (context, state) => ProfileView(),
+        ),
+        GoRoute(
+          path: '/event',
+          builder: (context, state) => EventListPage(),
         )
       ],
     );
@@ -45,6 +50,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-

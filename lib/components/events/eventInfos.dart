@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ticket_flutter/event.dart';
+import 'package:ticket_flutter/supabase.dart';
 import 'package:ticket_flutter/utils.dart';
-import 'package:ticket_flutter/views/eventForm.dart';
+import './eventForm.dart';
 
 class EventInfos extends StatefulWidget {
   final int eventId;

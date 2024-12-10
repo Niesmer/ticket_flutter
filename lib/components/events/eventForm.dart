@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ticket_flutter/event.dart';
+import 'package:ticket_flutter/supabase.dart';
 import 'package:ticket_flutter/utils.dart';
 
 class EventForm extends StatefulWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ticket_flutter/views/eventInfos.dart';
+import 'package:ticket_flutter/supabase.dart';
+import './eventInfos.dart';
 import 'package:ticket_flutter/utils.dart';
-import '../event.dart';
 
 class EventListRow extends StatelessWidget {
   final Event event;
