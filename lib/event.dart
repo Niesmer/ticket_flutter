@@ -106,7 +106,7 @@ class Event {
      TimeOfDay openingTimeTicket,
      DateTime closingDateTicket,
      TimeOfDay closingTimeTicket,
-     int createdBy,) async {
+     ) async {
         final response = await supabase.from('Events').update({
      'name': name,
       'event_date_start': eventDateStart.toIso8601String(),
@@ -120,8 +120,7 @@ class Event {
       'closing_date_ticket': closingDateTicket.toIso8601String(),
       'closing_time_ticket': '${closingTimeTicket.hour}:${closingTimeTicket.minute}',
       'state': 0,
-      'user_liking_ids': [],
-      'created_by': createdBy}).match({'id': id}).select();
+      'user_liking_ids': []}).match({'id': id}).select();
       print(response);
       return Event.fromJson(response[0]);
 

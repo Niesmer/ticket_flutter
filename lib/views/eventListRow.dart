@@ -22,13 +22,21 @@ class EventListRow extends StatelessWidget {
         'Fin: ${parseDate(event.eventDateEnd, event.eventTimeEnd)}\n'
         'Tickets: ${event.ticketsNbr}',
       ),
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EventInfos(eventId: event.id),
+            builder: (context) => EventInfos(
+              eventId: event.id,
+              onEventChanged: onEventChanged, // Transmet le callback
+            ),
           ),
         );
+
+        // Si les modifications ont été effectuées dans EventInfos, appelle le callback
+        if (result == true) {
+          onEventChanged();
+        }
       },
     );
   }
