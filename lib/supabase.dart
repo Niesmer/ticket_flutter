@@ -15,6 +15,16 @@ class UserProfile {
     required this.prenom,
     this.likedIds,
   });
+
+  static UserProfile fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      id: json['id'] as String,
+      pseudo: json['pseudo'] as String,
+      nom: json['nom'] as String,
+      prenom: json['prenom'] as String,
+      likedIds: List<int>.from(json['likedIds'] ?? []),
+    );
+  }
 }
 
 class Event {
@@ -31,8 +41,7 @@ class Event {
   final DateTime closingDateTicket;
   final TimeOfDay closingTimeTicket;
   final int? state;
-  final List<int>? likedIds;
-  final int createdBy; // int dans la base de données
+  final String createdBy; // int dans la base de données
 
   Event({
     required this.id,
@@ -49,7 +58,6 @@ class Event {
     required this.closingTimeTicket,
     required this.createdBy,
     this.state,
-    this.likedIds,
   });
 
   // Récupération de tous les événements depuis la base de données elt à envoyer : id, name, event_date, location, tickets_nbr
@@ -174,8 +182,7 @@ class Event {
             int.parse((json['closing_time_ticket'] as String).split(':')[1]),
       ),
       state: json['state'] as int,
-      likedIds: List<int>.from(json['user_liking_ids'] ?? []),
-      createdBy: json['created_by'] as int,
+      createdBy: json['created_by'] as String,
     );
   }
 
@@ -197,7 +204,6 @@ class Event {
       'closing_time_ticket':
           '${closingTimeTicket.hour}:${closingTimeTicket.minute}',
       'state': state,
-      'user_liking_ids': likedIds,
       'created_by': createdBy,
     };
   }
@@ -248,10 +254,13 @@ class SupaConnect {
     }
   }
 
+  Future<List<UserProfile>> getAllUsers() async {
+    final data = await client.from('Profiles').select('*');
+    return data.map((user) => UserProfile.fromJson(user)).toList();
+  }
+
   Future<UserProfile> getUser() async {
     var user = client.auth.currentUser;
-    print(user);
-    print(client.auth.currentSession);
     if (user == null) {
       throw Exception('No user signed in');
     }
