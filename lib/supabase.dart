@@ -15,6 +15,10 @@ class UserProfile {
     required this.prenom,
     this.likedIds,
   });
+
+  static UserProfile fromJson(Map<String, dynamic> json){
+    return ;
+  }
 }
 
 class Event {
@@ -267,6 +271,26 @@ class SupaConnect {
       prenom: data['prenom'],
       likedIds: List<int>.from(data['likedIds'] ?? []),
     );
+  }
+
+  Future<UserProfile> getUserById(String id) async {
+    final response =
+        await client.from('Profiles').select().eq('id', id).single();
+            final data = response;
+    return UserProfile(
+      id: data['id'],
+      pseudo: data['pseudo'],
+      nom: data['nom'],
+      prenom: data['prenom'],
+      likedIds: List<int>.from(data['likedIds'] ?? []),
+    );   
+  }
+  
+  Future<List<UserProfile>> getUserByLike(String id) async {
+    final response =
+        await client.from('Profiles').select().filter('liked_ids', 'cs', '[$id]');
+            final data = response;
+    return data.map((user) => UserProfile.fromJson(user)).toList();
   }
 
   // Sign in an existing user
