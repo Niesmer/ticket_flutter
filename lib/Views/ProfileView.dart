@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ticket_flutter/supabase.dart';
 
 class ProfileView extends StatelessWidget {
@@ -7,7 +6,7 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserProfile>(
+    return FutureBuilder<UserProfile?>(
       future: SupaConnect().getUser(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -60,9 +59,7 @@ class ProfileView extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      SupaConnect().signOut();
-                    },
+                    onPressed: () => SupaConnect().signOut(),
                     child: Text('Logout'),
                   ),
                 ],

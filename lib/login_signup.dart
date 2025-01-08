@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ticket_flutter/global.dart';
 import 'package:ticket_flutter/supabase.dart';
 
 class LoginSignup extends StatefulWidget {
   const LoginSignup({super.key});
-
+  
   @override
   _LoginSignupState createState() => _LoginSignupState();
 }
@@ -28,9 +30,14 @@ class _LoginSignupState extends State<LoginSignup> {
       _formKey.currentState!.save();
       // Perform login or signup logic here
       if (_isLogin) {
-        return await SupaConnect().signIn(_email, _password);
+        var userLogingIn = await SupaConnect().signIn(_email, _password);
+        if (userLogingIn != null) {
+          currentUser = userLogingIn;
+          return;
+        }
       }
-      return await SupaConnect().signUp(_email, _password, _pseudo, _nom, _prenom);
+      return await SupaConnect()
+          .signUp(_email, _password, _pseudo, _nom, _prenom);
     }
   }
 
@@ -60,6 +67,7 @@ class _LoginSignupState extends State<LoginSignup> {
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Password'),
+                onFieldSubmitted: (value) => _submit(),
                 obscureText: true,
                 validator: (value) {
                   if (value!.isEmpty || value.length < 6) {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +8,7 @@ class UserProfile {
   final String pseudo;
   final String nom;
   final String prenom;
+  final int role;
   final List<int>? likedIds;
 
   UserProfile({
@@ -13,8 +16,13 @@ class UserProfile {
     required this.pseudo,
     required this.nom,
     required this.prenom,
+    required this.role,
     this.likedIds,
   });
+
+  bool get isAdmin {
+    return role == 1;
+  }
 }
 
 class Event {
@@ -205,14 +213,11 @@ class Event {
 
 class SupaConnect {
   static final SupaConnect _instance = SupaConnect._internal();
-  static bool _initialized = false;
+  static Completer<void>? _initializerCompleter;
+
+  SupabaseClient? _client;
 
   factory SupaConnect() {
-    if (_initialized) {
-      return _instance;
-    }
-    _instance._initialize();
-    _initialized = true;
     return _instance;
   }
 
@@ -224,21 +229,39 @@ class SupaConnect {
       anonKey:
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoaGJsZXVmcGF4c3ppbHBia2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE0ODg1ODIsImV4cCI6MjA0NzA2NDU4Mn0.z8T0eHxBdavBVKNEgdTXAgv7ahOF5mxfCyA1t0Bxpls',
     );
+    _client = Supabase.instance.client;
   }
 
-  SupabaseClient get client => Supabase.instance.client;
+  static Future<void> ensureInitialized() async {
+    if (_initializerCompleter == null) {
+      _initializerCompleter = Completer<void>();
+      _instance._initialize().then((_) {
+        _initializerCompleter?.complete();
+      }).catchError((error) {
+        _initializerCompleter?.completeError(error);
+      });
+    }
+    await _initializerCompleter?.future;
+  }
 
-  // Sign up a new user
+  SupabaseClient get client {
+    if (_client == null) {
+      throw Exception(
+          'SupaConnect not initialized. Call SupaConnect.ensureInitialized().');
+    }
+    return _client!;
+  }
+
   Future<void> signUp(String email, String password, String pseudo, String nom,
       String prenom) async {
+    await SupaConnect.ensureInitialized();
     try {
-      // Step 1: Sign up the user with email and password
       final response = await client.auth.signUp(
-          email: email,
-          password: password,
-          data: {'name': nom, 'firstname': prenom, 'pseudo': pseudo});
+        email: email,
+        password: password,
+        data: {'name': nom, 'firstname': prenom, 'pseudo': pseudo},
+      );
 
-      // Ensure user is created successfully
       final user = response.user;
       if (user == null) {
         throw Exception('User creation failed');
@@ -248,12 +271,11 @@ class SupaConnect {
     }
   }
 
-  Future<UserProfile> getUser() async {
+  Future<UserProfile?> getUser() async {
+    await SupaConnect.ensureInitialized();
     var user = client.auth.currentUser;
-    print(user);
-    print(client.auth.currentSession);
     if (user == null) {
-      throw Exception('No user signed in');
+      return null;
     }
 
     final response =
@@ -265,17 +287,24 @@ class SupaConnect {
       pseudo: data['pseudo'],
       nom: data['nom'],
       prenom: data['prenom'],
+      role: data['role'],
       likedIds: List<int>.from(data['likedIds'] ?? []),
     );
   }
 
-  // Sign in an existing user
-  Future<void> signIn(String email, String password) async {
-    await client.auth.signInWithPassword(email: email, password: password);
+  Future<UserProfile?> signIn(String email, String password) async {
+    await SupaConnect.ensureInitialized();
+    AuthResponse rep =
+        await client.auth.signInWithPassword(email: email, password: password);
+    if (rep.user == null) {
+      return null;
+    }
+
+    return await getUser();
   }
 
-  // Sign out the current user
   Future<void> signOut() async {
+    await SupaConnect.ensureInitialized();
     await client.auth.signOut().catchError(
         (error) => throw Exception('Sign-out failed: ${error.toString()}'));
   }
