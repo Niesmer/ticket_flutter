@@ -16,20 +16,91 @@ class UserProfile {
     this.likedIds,
   });
 
-  static UserProfile fromJson(Map<String, dynamic> json) {
-    return UserProfile(
-      id: json['id'] as String,
-      pseudo: json['pseudo'] as String,
-      nom: json['nom'] as String,
-      prenom: json['prenom'] as String,
-      likedIds: List<int>.from(json['likedIds'] ?? []),
-    );
+  
+
+  
+
+}
+
+class Command{
+  final int id;
+  final int idEvent;
+  final String idUser;
+  final List<String> seatNbr;
+
+  Command({
+    required this.id,
+    required this.idEvent,
+    required this.idUser,
+    required this.seatNbr
+  });
+
+  Future<List<Command>> getCommandsByEvent(int idEvent) async {
+     final data =
+        await SupaConnect().client.from('Command').select().eq('id_event', id);
+      return data.map((cmd) => Command.fromJson(cmd)).toList();
+
+  }
+  Future<List<Command>> getCommandsByUser(String idUser) async {
+     final data =
+        await SupaConnect().client.from('Command').select().eq('id_user', id);
+      return data.map((cmd) => Command.fromJson(cmd)).toList();
+
+  }
+
+  static Future<Command> createOne(int idEvent, String idUser, List<String> seatNbr) async {
+    final response = await SupaConnect().client.from('Command').insert({
+      'id_user': idUser,
+      'id_event' : idEvent,
+      'seat_nbr': seatNbr,
+    }).select();
+    return Command.fromJson(response[0]);
+  }
+
+
+static Future<bool> seatAlreadyExists(String seatNbr, int eventId) async {
+  try {
+    final response = await SupaConnect().client
+        .from('Command')
+        .select('*')
+        .eq('id_event', eventId);
+   
+    if (response.isEmpty) {
+      return false; 
+    }
+
+    
+    final List<dynamic> commands = response[0] as List;
+    for (var command in commands) {
+      List<String> seatNumbers = List<String>.from(command['seat_nbr']);
+      if (seatNumbers.contains(seatNbr)) {
+        return true; 
+      }
+    }
+
+    return false; 
+  } catch (e) {
+    throw Exception('Error checking seat number: $e');
+  }
+}
+
+
+
+  
+
+  static Command fromJson(Map<String, dynamic> json) {
+    return Command(
+      id: json['id'] as int,
+      idEvent: json['id_event'] as int,
+      idUser: json['id_user'] as String,
+seatNbr: List<String>.from(json['seat_nbr'] as List)    );
   }
 
 }
 
 class Event {
   final int id;
+  final int price;
   final String name;
   final DateTime eventDateStart;
   final DateTime eventDateEnd;
@@ -46,6 +117,7 @@ class Event {
 
   Event({
     required this.id,
+    required this.price,
     required this.name,
     required this.eventDateStart,
     required this.eventDateEnd,
@@ -81,6 +153,7 @@ class Event {
 
   static Future<Event> createOne(
     String name,
+    int price,
     DateTime eventDateStart,
     DateTime eventDateEnd,
     TimeOfDay eventTimeStart,
@@ -91,10 +164,11 @@ class Event {
     TimeOfDay openingTimeTicket,
     DateTime closingDateTicket,
     TimeOfDay closingTimeTicket,
-    int createdBy,
+    String createdBy,
   ) async {
     final response = await SupaConnect().client.from('Events').insert({
       'name': name,
+      'price' : price,
       'event_date_start': eventDateStart.toIso8601String(),
       'event_date_end': eventDateEnd.toIso8601String(),
       'event_time_start': '${eventTimeStart.hour}:${eventTimeStart.minute}:00',
@@ -108,7 +182,6 @@ class Event {
       'closing_time_ticket':
           '${closingTimeTicket.hour}:${closingTimeTicket.minute}:00',
       'state': 0,
-      'user_liking_ids': [],
       'created_by': createdBy,
     }).select();
     return Event.fromJson(response[0]);
@@ -121,6 +194,7 @@ class Event {
   static Future<Event> updateOne(
     int id,
     String name,
+    int price,
     DateTime eventDateStart,
     DateTime eventDateEnd,
     TimeOfDay eventTimeStart,
@@ -134,6 +208,7 @@ class Event {
   ) async {
     final response = await SupaConnect().client.from('Events').update({
       'name': name,
+      'price' : price,
       'event_date_start': eventDateStart.toIso8601String(),
       'event_date_end': eventDateEnd.toIso8601String(),
       'event_time_start': '${eventTimeStart.hour}:${eventTimeStart.minute}',
@@ -147,10 +222,16 @@ class Event {
       'closing_time_ticket':
           '${closingTimeTicket.hour}:${closingTimeTicket.minute}',
       'state': 0,
-      'user_liking_ids': []
     }).match({'id': id}).select();
     print(response);
     return Event.fromJson(response[0]);
+  }
+
+  static void updateTickets(int idEvent, int nbrTicket) async {
+    await SupaConnect().client.from('Events').update({
+            'tickets_nbr': nbrTicket,
+
+    }).match({'id' : idEvent});
   }
 
   // Conversion d'un JSON en objet Event
@@ -158,6 +239,7 @@ class Event {
     return Event(
       id: json['id'] as int,
       name: json['name'] as String,
+      price : json['price'] as int,
       eventDateStart: DateTime.parse(json['event_date_start'] as String),
       eventDateEnd: DateTime.parse(json['event_date_end'] as String),
       eventTimeStart: TimeOfDay(
@@ -191,6 +273,7 @@ class Event {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'price' : price,
       'name': name,
       'event_date_start': eventDateStart.toIso8601String(),
       'event_date_end': eventDateEnd.toIso8601String(),
@@ -235,7 +318,24 @@ class SupaConnect {
 
   SupabaseClient get client => Supabase.instance.client;
 
-  // Sign up a new user
+Future<UserProfile> getUser() async {
+    var user = client.auth.currentUser;
+    if (user == null) {
+      throw Exception('No user signed in');
+    }
+
+    final response =
+        await client.from('Profiles').select().eq('id', user.id).single();
+
+    final data = response;
+    return UserProfile(
+      id: data['id'],
+      pseudo: data['pseudo'],
+      nom: data['nom'],
+      prenom: data['prenom'],
+      likedIds: List<int>.from(data['likedIds'] ?? []),
+    );
+  } 
   Future<void> signUp(String email, String password, String pseudo, String nom,
       String prenom) async {
     try {
@@ -253,35 +353,27 @@ class SupaConnect {
     } catch (error) {
       throw Exception('Sign-up failed: ${error.toString()}');
     }
+  } 
+   Future<void> signIn(String email, String password) async {
+    await client.auth.signInWithPassword(email: email, password: password);
   }
 
-  Future<List<UserProfile>> getAllUsers() async {
-    final data = await client.from('Profiles').select('*');
-    return data.map((user) => UserProfile.fromJson(user)).toList();
+  // Sign out the current user
+  Future<void> signOut() async {
+    await client.auth.signOut().catchError(
+        (error) => throw Exception('Sign-out failed: ${error.toString()}'));
   }
 
-  Future<UserProfile> getUser() async {
-    var user = client.auth.currentUser;
-    if (user == null) {
-      throw Exception('No user signed in');
-    }
+Future<List<UserProfile>> getAllUsers() async {
+    final data = await SupaConnect().client.from('Profiles').select('*');
+    return data.map((user) => fromJson(user)).toList();
+  }
 
+  
+
+  static Future<UserProfile> getUserById(String id) async {
     final response =
-        await client.from('Profiles').select().eq('id', user.id).single();
-
-    final data = response;
-    return UserProfile(
-      id: data['id'],
-      pseudo: data['pseudo'],
-      nom: data['nom'],
-      prenom: data['prenom'],
-      likedIds: List<int>.from(data['likedIds'] ?? []),
-    );
-  }
-
-  Future<UserProfile> getUserById(String id) async {
-    final response =
-        await client.from('Profiles').select().eq('id', id).single();
+        await SupaConnect().client.from('Profiles').select().eq('id', id).single();
             final data = response;
     return UserProfile(
       id: data['id'],
@@ -292,21 +384,19 @@ class SupaConnect {
     );   
   }
   
-  Future<List<UserProfile>> getUserByLike(String id) async {
-    final response =
-        await client.from('Profiles').select().filter('liked_ids', 'cs', '[$id]');
-            final data = response;
-    return data.map((user) => UserProfile.fromJson(user)).toList();
-  }
+ 
+
 
   // Sign in an existing user
-  Future<void> signIn(String email, String password) async {
-    await client.auth.signInWithPassword(email: email, password: password);
+ 
+  static UserProfile fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      id: json['id'] as String,
+      pseudo: json['pseudo'] as String,
+      nom: json['nom'] as String,
+      prenom: json['prenom'] as String,
+      likedIds: List<int>.from(json['likedIds'] ?? []),
+    );
   }
 
-  // Sign out the current user
-  Future<void> signOut() async {
-    await client.auth.signOut().catchError(
-        (error) => throw Exception('Sign-out failed: ${error.toString()}'));
-  }
 }
