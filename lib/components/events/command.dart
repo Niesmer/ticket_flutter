@@ -4,7 +4,7 @@ import 'package:ticket_flutter/utils.dart';
 
 class CommandPage extends StatefulWidget {
   final int eventId;
-  final UserProfile user;
+  final UserProfile? user;
 
   const CommandPage({
     super.key,
@@ -121,7 +121,7 @@ class _CommandState extends State<CommandPage> {
                         if (confirm == true) {
                           // Assuming Command.createOne is defined elsewhere
                           await Command.createOne(
-                              event.id, widget.user.id, _seats);
+                              event.id, widget.user!.id, _seats);
                           Event.updateTickets(event.id, event.ticketsNbr - _ticketQuantity);
                           Navigator.pop(context, true); // Retourne à la liste
                         }
@@ -140,7 +140,7 @@ class _CommandState extends State<CommandPage> {
 }
 
 Future<bool?> _showConfirmationDialog(
-    BuildContext context, Event event, UserProfile user, int? ticketQuantity) {
+    BuildContext context, Event event, UserProfile? user, int? ticketQuantity) {
   return showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -171,7 +171,7 @@ Future<bool?> _showConfirmationDialog(
             ),
             const SizedBox(height: 16),
             Text(
-              'Nom : ${user.nom}',
+              'Nom : ${user!.nom}',
               style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 16),

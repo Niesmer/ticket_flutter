@@ -14,7 +14,6 @@ class EventForm extends StatefulWidget {
 
 class _EventFormState extends State<EventForm> {
   final _formKey = GlobalKey<FormState>();
-  String? userId;
   List<String>? _errors;
 
   // Champs du formulaire
@@ -38,16 +37,9 @@ class _EventFormState extends State<EventForm> {
     super.initState();
     if (widget.eventId != null) {
       _loadEventDetails();
-      _fetchUser();
-      print(userId);
     } else {
       _isLoading = false;
     }
-  }
-
-  void _fetchUser() async{
-    UserProfile? user = await SupaConnect().getUser();
-    userId = user!.id;
   }
 
   Future<void> _loadEventDetails() async {
@@ -55,7 +47,6 @@ class _EventFormState extends State<EventForm> {
       final event = await Event.getOne(widget.eventId!);
       setState(() {
         _name = event.name;
-        _price = event.price;
         _eventDateStart = event.eventDateStart;
         _eventTimeStart = event.eventTimeStart;
         _eventDateEnd = event.eventDateEnd;
@@ -106,6 +97,7 @@ class _EventFormState extends State<EventForm> {
 
   void _submitForm() async {
     _errors = [];
+    print("submited");
 
     final newErrors = validateDates(
       _openingDateTicket,
@@ -120,9 +112,11 @@ class _EventFormState extends State<EventForm> {
 
     setState(() {
       if (_errors == null) {
+        print(_errors);
         _errors = newErrors;
       } else {
         _errors!.addAll(newErrors!);
+        print(_errors);
       }
     });
 
@@ -131,6 +125,7 @@ class _EventFormState extends State<EventForm> {
     }
 
     if (_formKey.currentState!.validate()) {
+      print("oui");
       _formKey.currentState!.save();
       if (widget.eventId != null) {
         // Mise à jour
@@ -169,6 +164,8 @@ class _EventFormState extends State<EventForm> {
       }
 
       Navigator.pop(context, true);
+    } else {
+      print("pas marché");
     }
   }
 
@@ -190,6 +187,15 @@ class _EventFormState extends State<EventForm> {
           key: _formKey,
           child: Column(
             children: [
+              if (_errors != null && _errors!.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  color: Colors.redAccent,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _errors!.map((error) => Text(error, style: const TextStyle(color: Colors.white))).toList(),
+                  ),
+                ),
               TextFormField(
                 initialValue: _name,
                 decoration:
@@ -200,6 +206,7 @@ class _EventFormState extends State<EventForm> {
                   }
                   return null;
                 },
+                onSaved: (value) => _name = value,
               ),
               TextFormField(
                 initialValue: _price?.toString(),

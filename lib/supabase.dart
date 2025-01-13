@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
@@ -220,7 +221,6 @@ class Event {
           '${closingTimeTicket.hour}:${closingTimeTicket.minute}',
       'state': 0,
     }).match({'id': id}).select();
-    print('oui');
     return Event.fromJson(response[0]);
   }
 

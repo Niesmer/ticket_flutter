@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticket_flutter/global.dart';
 import 'package:ticket_flutter/supabase.dart';
 import 'package:ticket_flutter/utils.dart';
 import './command.dart';
@@ -19,30 +20,14 @@ class EventInfosClient extends StatefulWidget {
 
 class _EventInfosClientState extends State<EventInfosClient> {
   late Future<Event> _eventFuture;
-  late UserProfile _user;
+  late UserProfile? _user;
   String? errorMessage;
-
-
 
   @override
   void initState() {
-
     super.initState();
     _loadEvent();
-    _fetchUserProfile();
-  }
-
-  Future<void> _fetchUserProfile() async {
-    try {
-      UserProfile user = await SupaConnect().getUser();
-      setState(() {
-        _user = user;
-      });
-    } catch (e) {
-      setState(() {
-        errorMessage = e.toString();
-      });
-    }
+    _user = currentUser;
   }
 
   void _loadEvent() {
@@ -55,12 +40,13 @@ class _EventInfosClientState extends State<EventInfosClient> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CommandPage(eventId: widget.eventId, user : _user),
+        builder: (context) => CommandPage(eventId: widget.eventId, user: _user),
       ),
     );
 
     if (result == true) {
-      widget.onEventChanged(); // Notifie le parent que des modifications ont été faites
+      widget
+          .onEventChanged(); // Notifie le parent que des modifications ont été faites
       _loadEvent();
     }
   }
@@ -129,7 +115,6 @@ class _EventInfosClientState extends State<EventInfosClient> {
                         icon: const Icon(Icons.edit),
                         label: const Text('Commander'),
                       ),
-                     
                     ],
                   ),
                 ],
@@ -139,6 +124,5 @@ class _EventInfosClientState extends State<EventInfosClient> {
         },
       ),
     );
-  
   }
 }
