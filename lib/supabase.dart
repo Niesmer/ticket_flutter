@@ -10,6 +10,7 @@ class UserProfile {
   final String prenom;
   final int role;
   final List<int>? likedIds;
+  final String email;
 
   UserProfile({
     required this.id,
@@ -17,6 +18,7 @@ class UserProfile {
     required this.nom,
     required this.prenom,
     required this.role,
+    required this.email,
     this.likedIds,
   });
 
@@ -40,7 +42,7 @@ class Event {
   final TimeOfDay closingTimeTicket;
   final int? state;
   final List<int>? likedIds;
-  final int createdBy; // int dans la base de données
+  final String createdBy; // int dans la base de données
 
   Event({
     required this.id,
@@ -63,7 +65,6 @@ class Event {
   // Récupération de tous les événements depuis la base de données elt à envoyer : id, name, event_date, location, tickets_nbr
   static Future<List<Event>> getAll() async {
     final data = await SupaConnect().client.from('Events').select('*');
-    print(data);
     return data.map((event) => Event.fromJson(event)).toList();
   }
 
@@ -90,7 +91,7 @@ class Event {
     TimeOfDay openingTimeTicket,
     DateTime closingDateTicket,
     TimeOfDay closingTimeTicket,
-    int createdBy,
+    String createdBy,
   ) async {
     final response = await SupaConnect().client.from('Events').insert({
       'name': name,
@@ -107,7 +108,6 @@ class Event {
       'closing_time_ticket':
           '${closingTimeTicket.hour}:${closingTimeTicket.minute}:00',
       'state': 0,
-      'user_liking_ids': [],
       'created_by': createdBy,
     }).select();
     return Event.fromJson(response[0]);
@@ -146,9 +146,8 @@ class Event {
       'closing_time_ticket':
           '${closingTimeTicket.hour}:${closingTimeTicket.minute}',
       'state': 0,
-      'user_liking_ids': []
     }).match({'id': id}).select();
-    print(response);
+    print('oui');
     return Event.fromJson(response[0]);
   }
 
@@ -182,8 +181,7 @@ class Event {
             int.parse((json['closing_time_ticket'] as String).split(':')[1]),
       ),
       state: json['state'] as int,
-      likedIds: List<int>.from(json['user_liking_ids'] ?? []),
-      createdBy: json['created_by'] as int,
+      createdBy: json['created_by'] as String,
     );
   }
 
@@ -205,7 +203,6 @@ class Event {
       'closing_time_ticket':
           '${closingTimeTicket.hour}:${closingTimeTicket.minute}',
       'state': state,
-      'user_liking_ids': likedIds,
       'created_by': createdBy,
     };
   }
@@ -289,6 +286,7 @@ class SupaConnect {
       prenom: data['prenom'],
       role: data['role'],
       likedIds: List<int>.from(data['likedIds'] ?? []),
+      email: user.email ?? '',
     );
   }
 

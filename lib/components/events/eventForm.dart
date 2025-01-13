@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticket_flutter/global.dart';
 import 'package:ticket_flutter/supabase.dart';
 import 'package:ticket_flutter/utils.dart';
 
@@ -67,10 +68,18 @@ class _EventFormState extends State<EventForm> {
 
   Future<void> _selectDate(BuildContext context, DateTime? initialDate,
       Function(DateTime) onDateSelected) async {
+    // Get current date
+    final now = DateTime.now();
+
+    // Determine the initial date, ensuring it's not before today
+    final effectiveInitialDate = initialDate != null
+        ? (initialDate.isBefore(now) ? now : initialDate)
+        : now;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: initialDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: effectiveInitialDate,
+      firstDate: now,
       lastDate: DateTime(2100),
     );
     if (picked != null) onDateSelected(picked);
@@ -113,7 +122,6 @@ class _EventFormState extends State<EventForm> {
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-
       if (widget.eventId != null) {
         // Mise à jour
         await Event.updateOne(
@@ -144,7 +152,7 @@ class _EventFormState extends State<EventForm> {
           _openingTimeTicket!,
           _closingDateTicket!,
           _closingTimeTicket!,
-          1, // Remplacer par l'ID utilisateur réel
+          currentUser!.id, // Remplacer par l'ID utilisateur réel
         );
       }
 
@@ -160,7 +168,9 @@ class _EventFormState extends State<EventForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.eventId != null ? 'Modifier Événement' : 'Ajouter Événement'),
+        title: Text(widget.eventId != null
+            ? 'Modifier Événement'
+            : 'Ajouter Événement'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -170,7 +180,8 @@ class _EventFormState extends State<EventForm> {
             children: [
               TextFormField(
                 initialValue: _name,
-                decoration: const InputDecoration(labelText: 'Nom de l\'événement'),
+                decoration:
+                    const InputDecoration(labelText: 'Nom de l\'événement'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Veuillez entrer un nom.';
@@ -232,7 +243,8 @@ class _EventFormState extends State<EventForm> {
               ),
               TextFormField(
                 initialValue: _ticketsNbr?.toString(),
-                decoration: const InputDecoration(labelText: 'Nombre de tickets'),
+                decoration:
+                    const InputDecoration(labelText: 'Nombre de tickets'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
@@ -288,18 +300,20 @@ class _EventFormState extends State<EventForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 141, 150, 199),
-                  textStyle: const TextStyle(color : Colors.white)
-                ),
-                child: Text(widget.eventId != null ? 'Modifier' : 'Ajouter'),
-              ),
-              ElevatedButton(
-                onPressed: _closeForm,
-                child: const Text('Annuler'),
-              ),],)
-              
+                    onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color.fromARGB(255, 141, 150, 199),
+                        textStyle: const TextStyle(color: Colors.white)),
+                    child:
+                        Text(widget.eventId != null ? 'Modifier' : 'Ajouter'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _closeForm,
+                    child: const Text('Annuler'),
+                  ),
+                ],
+              )
             ],
           ),
         ),
