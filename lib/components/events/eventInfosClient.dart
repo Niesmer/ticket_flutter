@@ -1,29 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:ticket_flutter/supabase.dart';
 import 'package:ticket_flutter/utils.dart';
-import './eventForm.dart';
+import './command.dart';
 
-class EventInfos extends StatefulWidget {
+class EventInfosClient extends StatefulWidget {
   final int eventId;
   final VoidCallback onEventChanged;
 
-  const EventInfos({
+  const EventInfosClient({
     super.key,
     required this.eventId,
     required this.onEventChanged,
   });
 
   @override
-  _EventInfosState createState() => _EventInfosState();
+  _EventInfosClientState createState() => _EventInfosClientState();
 }
 
-class _EventInfosState extends State<EventInfos> {
+class _EventInfosClientState extends State<EventInfosClient> {
   late Future<Event> _eventFuture;
+  late UserProfile _user;
+  String? errorMessage;
+
+
 
   @override
   void initState() {
+
     super.initState();
     _loadEvent();
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      UserProfile user = await SupaConnect().getUser();
+      setState(() {
+        _user = user;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+      });
+    }
   }
 
   void _loadEvent() {
@@ -32,11 +51,11 @@ class _EventInfosState extends State<EventInfos> {
     });
   }
 
-  Future<void> _onEditEvent() async {
+  Future<void> _onCommand() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EventForm(eventId: widget.eventId),
+        builder: (context) => CommandPage(eventId: widget.eventId, user : _user),
       ),
     );
 
@@ -106,28 +125,11 @@ class _EventInfosState extends State<EventInfos> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton.icon(
-                        onPressed: _onEditEvent,
+                        onPressed: _onCommand,
                         icon: const Icon(Icons.edit),
-                        label: const Text('Modifier'),
+                        label: const Text('Commander'),
                       ),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          textStyle: TextStyle(color : Colors.white)
-
-                       ),
-                        onPressed: () async {
-                          final confirm = await _showConfirmationDialog(context);
-                          if (confirm == true) {
-                            await Event.deleteOne(widget.eventId);
-                            widget.onEventChanged(); // Notifie le parent d'un changement
-                            Navigator.pop(context, true); // Retourne à la liste
-                          }
-                        },
-                        icon: const Icon(Icons.delete),
-                        label: const Text('Supprimer'),
-
-                      ),
+                     
                     ],
                   ),
                 ],
@@ -137,27 +139,6 @@ class _EventInfosState extends State<EventInfos> {
         },
       ),
     );
-  }
-
-  Future<bool?> _showConfirmationDialog(BuildContext context) {
-    return showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmation'),
-          content: const Text('Êtes-vous sûr de vouloir supprimer cet événement ?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Annuler'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Supprimer'),
-            ),
-          ],
-        );
-      },
-    );
+  
   }
 }

@@ -27,8 +27,78 @@ class UserProfile {
   }
 }
 
+class Command {
+  final int id;
+  final int idEvent;
+  final String idUser;
+  final List<String> seatNbr;
+
+  Command(
+      {required this.id,
+      required this.idEvent,
+      required this.idUser,
+      required this.seatNbr});
+
+  Future<List<Command>> getCommandsByEvent(int idEvent) async {
+    final data =
+        await SupaConnect().client.from('Command').select().eq('id_event', id);
+    return data.map((cmd) => Command.fromJson(cmd)).toList();
+  }
+
+  Future<List<Command>> getCommandsByUser(String idUser) async {
+    final data =
+        await SupaConnect().client.from('Command').select().eq('id_user', id);
+    return data.map((cmd) => Command.fromJson(cmd)).toList();
+  }
+
+  static Future<Command> createOne(
+      int idEvent, String idUser, List<String> seatNbr) async {
+    final response = await SupaConnect().client.from('Command').insert({
+      'id_user': idUser,
+      'id_event': idEvent,
+      'seat_nbr': seatNbr,
+    }).select();
+    return Command.fromJson(response[0]);
+  }
+
+  static Future<bool> seatAlreadyExists(String seatNbr, int eventId) async {
+    try {
+      final response = await SupaConnect()
+          .client
+          .from('Command')
+          .select('*')
+          .eq('id_event', eventId);
+
+      if (response.isEmpty) {
+        return false;
+      }
+
+      final List<dynamic> commands = response[0] as List;
+      for (var command in commands) {
+        List<String> seatNumbers = List<String>.from(command['seat_nbr']);
+        if (seatNumbers.contains(seatNbr)) {
+          return true;
+        }
+      }
+
+      return false;
+    } catch (e) {
+      throw Exception('Error checking seat number: $e');
+    }
+  }
+
+  static Command fromJson(Map<String, dynamic> json) {
+    return Command(
+        id: json['id'] as int,
+        idEvent: json['id_event'] as int,
+        idUser: json['id_user'] as String,
+        seatNbr: List<String>.from(json['seat_nbr'] as List));
+  }
+}
+
 class Event {
   final int id;
+  final int price;
   final String name;
   final DateTime eventDateStart;
   final DateTime eventDateEnd;
@@ -41,11 +111,11 @@ class Event {
   final DateTime closingDateTicket;
   final TimeOfDay closingTimeTicket;
   final int? state;
-  final List<int>? likedIds;
   final String createdBy; // int dans la base de données
 
   Event({
     required this.id,
+    required this.price,
     required this.name,
     required this.eventDateStart,
     required this.eventDateEnd,
@@ -59,7 +129,6 @@ class Event {
     required this.closingTimeTicket,
     required this.createdBy,
     this.state,
-    this.likedIds,
   });
 
   // Récupération de tous les événements depuis la base de données elt à envoyer : id, name, event_date, location, tickets_nbr
@@ -81,6 +150,7 @@ class Event {
 
   static Future<Event> createOne(
     String name,
+    int price,
     DateTime eventDateStart,
     DateTime eventDateEnd,
     TimeOfDay eventTimeStart,
@@ -95,6 +165,7 @@ class Event {
   ) async {
     final response = await SupaConnect().client.from('Events').insert({
       'name': name,
+      'price': price,
       'event_date_start': eventDateStart.toIso8601String(),
       'event_date_end': eventDateEnd.toIso8601String(),
       'event_time_start': '${eventTimeStart.hour}:${eventTimeStart.minute}:00',
@@ -120,6 +191,7 @@ class Event {
   static Future<Event> updateOne(
     int id,
     String name,
+    int price,
     DateTime eventDateStart,
     DateTime eventDateEnd,
     TimeOfDay eventTimeStart,
@@ -133,6 +205,7 @@ class Event {
   ) async {
     final response = await SupaConnect().client.from('Events').update({
       'name': name,
+      'price': price,
       'event_date_start': eventDateStart.toIso8601String(),
       'event_date_end': eventDateEnd.toIso8601String(),
       'event_time_start': '${eventTimeStart.hour}:${eventTimeStart.minute}',
@@ -151,11 +224,18 @@ class Event {
     return Event.fromJson(response[0]);
   }
 
+  static void updateTickets(int idEvent, int nbrTicket) async {
+    await SupaConnect().client.from('Events').update({
+      'tickets_nbr': nbrTicket,
+    }).match({'id': idEvent});
+  }
+
   // Conversion d'un JSON en objet Event
   static Event fromJson(Map<String, dynamic> json) {
     return Event(
       id: json['id'] as int,
       name: json['name'] as String,
+      price: json['price'] as int,
       eventDateStart: DateTime.parse(json['event_date_start'] as String),
       eventDateEnd: DateTime.parse(json['event_date_end'] as String),
       eventTimeStart: TimeOfDay(
@@ -189,6 +269,7 @@ class Event {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'price': price,
       'name': name,
       'event_date_start': eventDateStart.toIso8601String(),
       'event_date_end': eventDateEnd.toIso8601String(),
@@ -275,9 +356,12 @@ class SupaConnect {
       return null;
     }
 
-    final response =
-        await client.from('Profiles').select().eq('id', user.id).single();
-
+    final response = await SupaConnect()
+        .client
+        .from('Profiles')
+        .select()
+        .eq('id', user.id)
+        .single();
     final data = response;
     return UserProfile(
       id: data['id'],

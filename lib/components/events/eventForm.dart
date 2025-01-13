@@ -14,10 +14,12 @@ class EventForm extends StatefulWidget {
 
 class _EventFormState extends State<EventForm> {
   final _formKey = GlobalKey<FormState>();
+  String? userId;
   List<String>? _errors;
 
   // Champs du formulaire
   String? _name;
+  int? _price;
   DateTime? _eventDateStart;
   TimeOfDay? _eventTimeStart;
   DateTime? _eventDateEnd;
@@ -36,9 +38,16 @@ class _EventFormState extends State<EventForm> {
     super.initState();
     if (widget.eventId != null) {
       _loadEventDetails();
+      _fetchUser();
+      print(userId);
     } else {
       _isLoading = false;
     }
+  }
+
+  void _fetchUser() async{
+    UserProfile? user = await SupaConnect().getUser();
+    userId = user!.id;
   }
 
   Future<void> _loadEventDetails() async {
@@ -46,6 +55,7 @@ class _EventFormState extends State<EventForm> {
       final event = await Event.getOne(widget.eventId!);
       setState(() {
         _name = event.name;
+        _price = event.price;
         _eventDateStart = event.eventDateStart;
         _eventTimeStart = event.eventTimeStart;
         _eventDateEnd = event.eventDateEnd;
@@ -127,6 +137,7 @@ class _EventFormState extends State<EventForm> {
         await Event.updateOne(
           widget.eventId!,
           _name!,
+          _price!,
           _eventDateStart!,
           _eventDateEnd!,
           _eventTimeStart!,
@@ -142,6 +153,7 @@ class _EventFormState extends State<EventForm> {
         // Création
         await Event.createOne(
           _name!,
+          _price!,
           _eventDateStart!,
           _eventDateEnd!,
           _eventTimeStart!,
@@ -188,7 +200,20 @@ class _EventFormState extends State<EventForm> {
                   }
                   return null;
                 },
-                onSaved: (value) => _name = value,
+              ),
+              TextFormField(
+                initialValue: _price?.toString(),
+                decoration: const InputDecoration(labelText: 'Prix'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null ||
+                      int.tryParse(value) == null ||
+                      int.parse(value) <= 0) {
+                    return 'Veuillez entrer un prix valide.';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _price = int.parse(value!),
               ),
               ListTile(
                 title: const Text('Date de début'),
