@@ -23,6 +23,7 @@ class _EventInfosClientState extends State<EventInfosClient> {
   late UserProfile? _user;
   String? errorMessage;
 
+
   @override
   void initState() {
     super.initState();
@@ -73,13 +74,18 @@ class _EventInfosClientState extends State<EventInfosClient> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  Row(
+                    children: [
+                      Text(
                     event.name,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
+                      ),
+                    ],
                   ),
+                  
                   const SizedBox(height: 16),
                   Text('Lieu : ${event.location}'),
                   const SizedBox(height: 8),
@@ -107,6 +113,20 @@ class _EventInfosClientState extends State<EventInfosClient> {
                     'Fermeture Billeterie :  ${parseDate(event.closingDateTicket, event.closingTimeTicket)}',
                   ),
                   const SizedBox(height: 16),
+                   if (!validateTicketOpening(event.openingDateTicket,event.openingTimeTicket)) ...[
+                  const Text(
+                    "La billeterie n'est pas encore ouverte."
+                  ),
+                   ]
+                  else if (!validateTicketClosing(event.closingDateTicket,event.closingTimeTicket)) ...[
+                  const Text(
+                    "La billeterie est fermée"
+                  ),
+                ] else if (event.ticketsNbr <= 0) ...[
+                  const Text(
+                    "Il n'y a plus de tickets disponibles.",
+                  ),
+                ] else ...[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -117,6 +137,7 @@ class _EventInfosClientState extends State<EventInfosClient> {
                       ),
                     ],
                   ),
+                ],
                 ],
               ),
             );

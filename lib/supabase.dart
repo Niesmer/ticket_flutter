@@ -74,9 +74,10 @@ class Command {
         return false;
       }
 
-      final List<dynamic> commands = response[0] as List;
+      List<Command> commands = response.map((command) => Command.fromJson(command)).toList();
+      print(commands);
       for (var command in commands) {
-        List<String> seatNumbers = List<String>.from(command['seat_nbr']);
+        List<String> seatNumbers = List<String>.from(command.seatNbr);
         if (seatNumbers.contains(seatNbr)) {
           return true;
         }

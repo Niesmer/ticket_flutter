@@ -21,7 +21,41 @@ String parseDateOnly(DateTime date) {
   return '$day/$month/$year';
 }
 
+bool validateTicketOpening(openingDateTicket, openingTimeTicket){
+  final now = DateTime.now();
+  final currentDate = DateTime(now.year, now.month, now.day);
+  final currentTime = TimeOfDay(hour : now.hour, minute : now.minute);
+
+   if (openingDateTicket != null && currentDate.isBefore(openingDateTicket)) {
+    return false;
+  } else if (openingDateTicket == currentDate && openingTimeTicket != null) {
+    if (!_isTimeBefore(currentTime, openingTimeTicket)) {
+      return false;
+    }
+  }
+  return true;
+}
+bool validateTicketClosing(closingDateTicket, closingTimeTicket){
+  final now = DateTime.now();
+  final currentDate = DateTime(now.year, now.month, now.day);
+  final currentTime = TimeOfDay(hour : now.hour, minute : now.minute);
+
+  if (closingDateTicket != null && currentDate.isAfter(closingDateTicket)) {
+    return false;
+  } else if (closingDateTicket == currentDate && closingTimeTicket != null) {
+    if (!_isTimeBefore(closingTimeTicket, currentTime)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool _isTimeBefore(TimeOfDay a, TimeOfDay b) {
+  return a.hour < b.hour || (a.hour == b.hour && a.minute < b.minute);
+}
+
 List<String>? validateDates(
+    update,
     openingDateTicket,
     closingDateTicket,
     openingTimeTicket,
@@ -35,8 +69,9 @@ List<String>? validateDates(
 
   List<String> listErrors = [];
 
-  // Vérification : Les dates doivent être dans le futur
-  if (openingDateTicket != null && openingDateTicket!.isBefore(currentDate)) {
+
+  if(!update){
+    if (openingDateTicket != null && openingDateTicket!.isBefore(currentDate)) {
     listErrors
         .add('La date d\'ouverture doit être aujourd\'hui ou dans le futur.');
   }
@@ -48,6 +83,9 @@ List<String>? validateDates(
     listErrors.add(
         'La date de début d\'événement doit être aujourd\'hui ou dans le futur.');
   }
+  }
+  // Vérification : Les dates doivent être dans le futur
+  
 
   if (eventDateStart != null &&
       openingDateTicket != null &&

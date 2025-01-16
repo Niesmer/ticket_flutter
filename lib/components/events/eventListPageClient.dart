@@ -45,10 +45,14 @@ class _EventListPageClientState extends State<EventListPageClient> {
              return ListView.builder(
               itemCount: events.length,
               itemBuilder: (context, index) {
-                return EventListRowClient(
+                if (events[index].state == 0){
+                  return EventListRowClient(
                   event: events[index],
                   onEventChanged: _refreshEvents, // Callback to refresh list
                 );
+                }
+                return null;
+                
               },
             );
           }
