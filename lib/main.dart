@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ticket_flutter/Views/AdminEventView.dart';
+import 'package:ticket_flutter/Views/CommandListUserView.dart';
 import 'package:ticket_flutter/Views/HomeView.dart';
 import 'package:ticket_flutter/Views/LoginView.dart';
 import 'package:ticket_flutter/Views/ProfileView.dart';
@@ -92,7 +94,9 @@ class _MyAppState extends State<MyApp> {
                 case 'Profil':
                   return ProfileView();
                 case 'Admin Event':
-                  return EventListPage();
+                  return Admineventview();
+                case 'Mes commandes':
+                  return CommandListUserView();
                 default:
                   return HomeView();
               }

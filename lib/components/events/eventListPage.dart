@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticket_flutter/global.dart';
 import 'package:ticket_flutter/supabase.dart';
 import './eventForm.dart';
 import './eventListRow.dart';
@@ -16,12 +17,12 @@ class _EventListPageState extends State<EventListPage> {
   @override
   void initState() {
     super.initState();
-    _futureEvents = Event.getAll();
+    _futureEvents = Event.getEventsByUser(currentUser!.id);
   }
 
    void _refreshEvents() {
     setState(() {
-      _futureEvents = Event.getAll(); // Refresh event list
+      _futureEvents = Event.getEventsByUser(currentUser!.id); // Refresh event list
     });
   }
 

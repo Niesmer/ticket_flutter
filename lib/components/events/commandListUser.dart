@@ -1,0 +1,63 @@
+import 'package:flutter/material.dart';
+import 'package:ticket_flutter/global.dart';
+import 'package:ticket_flutter/supabase.dart'; // Import the Supabase file
+
+class CommandListUser extends StatefulWidget {
+  const CommandListUser({super.key});
+
+  @override
+  _CommandListUserState createState() => _CommandListUserState();
+}
+
+class _CommandListUserState extends State<CommandListUser> {
+  late Future<List<Command>> _commandsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _commandsFuture = Command.getCommandsByUser(currentUser!.id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Command Page Admin'),
+      ),
+      body: FutureBuilder<List<Command>>(
+        future: _commandsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No commands found.'));
+          } else {
+            final commands = snapshot.data!;
+            print("Commands: $commands");
+            return ListView.builder(
+              itemCount: commands.length,
+              itemBuilder: (context, index) {
+                final command = commands[index];
+                print(command.user);
+                return ListTile(
+                  title: Text('Command ID: ${command.id}'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Mail: ${command.user!.email}'),
+                      Text(
+                          'Nom Prenom: ${command.user!.nom} ${command.user!.prenom}'),
+                      Text('Sièges : ${command.seatNbr}'),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
+}

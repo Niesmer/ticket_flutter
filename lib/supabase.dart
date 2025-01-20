@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -32,24 +30,35 @@ class Command {
   final int id;
   final int idEvent;
   final String idUser;
+  final UserProfile? user;
   final List<String> seatNbr;
 
-  Command(
-      {required this.id,
-      required this.idEvent,
-      required this.idUser,
-      required this.seatNbr});
+  Command({
+    required this.id,
+    required this.idEvent,
+    required this.idUser,
+    required this.seatNbr,
+    this.user,
+  });
 
-  Future<List<Command>> getCommandsByEvent(int idEvent) async {
-    final data =
-        await SupaConnect().client.from('Command').select().eq('id_event', id);
-    return data.map((cmd) => Command.fromJson(cmd)).toList();
+  static Future<List<Command>> getCommandsByEvent(int idEvent) async {
+    final data = await SupaConnect()
+        .client
+        .from('Command')
+        .select()
+        .eq('id_event', idEvent);
+    return Future.wait(
+        data.map((cmd) => Command.fromJsonWithUser(cmd)).toList());
   }
 
-  Future<List<Command>> getCommandsByUser(String idUser) async {
-    final data =
-        await SupaConnect().client.from('Command').select().eq('id_user', id);
-    return data.map((cmd) => Command.fromJson(cmd)).toList();
+  static Future<List<Command>> getCommandsByUser(String idUser) async {
+    final data = await SupaConnect()
+        .client
+        .from('Command')
+        .select()
+        .eq('id_user', idUser);
+    return Future.wait(
+        data.map((cmd) => Command.fromJsonWithUser(cmd)).toList());
   }
 
   static Future<Command> createOne(
@@ -95,6 +104,18 @@ class Command {
         idUser: json['id_user'] as String,
         seatNbr: List<String>.from(json['seat_nbr'] as List));
   }
+
+  static Future<Command> fromJsonWithUser(Map<String, dynamic> json) async {
+    print(json['id_user']);
+    final user = await SupaConnect().getUserById(json['id_user']);
+    print(user);
+    return Command(
+        id: json['id'] as int,
+        idEvent: json['id_event'] as int,
+        idUser: json['id_user'] as String,
+        seatNbr: List<String>.from(json['seat_nbr'] as List),
+        user: user);
+  }
 }
 
 class Event {
@@ -135,6 +156,15 @@ class Event {
   // Récupération de tous les événements depuis la base de données elt à envoyer : id, name, event_date, location, tickets_nbr
   static Future<List<Event>> getAll() async {
     final data = await SupaConnect().client.from('Events').select('*');
+    return data.map((event) => Event.fromJson(event)).toList();
+  }
+
+  static Future<List<Event>> getEventsByUser(String idUser) async {
+    final data = await SupaConnect()
+        .client
+        .from('Events')
+        .select('*')
+        .eq('created_by', idUser);
     return data.map((event) => Event.fromJson(event)).toList();
   }
 
@@ -347,6 +377,21 @@ class SupaConnect {
     } catch (error) {
       throw Exception('Sign-up failed: ${error.toString()}');
     }
+  }
+
+  Future<UserProfile?> getUserById(idUser) async {
+    await SupaConnect.ensureInitialized();
+    final data =
+        await client.from('Profiles').select().eq('id', idUser).single();
+    return UserProfile(
+      id: data['id'],
+      pseudo: data['pseudo'],
+      nom: data['nom'],
+      prenom: data['prenom'],
+      role: data['role'],
+      likedIds: List<int>.from(data['likedIds'] ?? []),
+      email: data['mail'],
+    );
   }
 
   Future<UserProfile?> getUser() async {
