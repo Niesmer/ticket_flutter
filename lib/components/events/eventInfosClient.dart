@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticket_flutter/components/like_btn.dart';
 import 'package:ticket_flutter/global.dart';
 import 'package:ticket_flutter/supabase.dart';
 import 'package:ticket_flutter/utils.dart';
@@ -22,6 +23,7 @@ class _EventInfosClientState extends State<EventInfosClient> {
   late Future<Event> _eventFuture;
   late UserProfile? _user;
   String? errorMessage;
+  bool _isLiked = false;
 
 
   @override
@@ -29,6 +31,7 @@ class _EventInfosClientState extends State<EventInfosClient> {
     super.initState();
     _loadEvent();
     _user = currentUser;
+    _checkIfLiked();
   }
 
   void _loadEvent() {
@@ -47,8 +50,30 @@ class _EventInfosClientState extends State<EventInfosClient> {
 
     if (result == true) {
       widget
-          .onEventChanged(); // Notifie le parent que des modifications ont été faites
+          .onEventChanged(); 
       _loadEvent();
+    }
+  }
+
+  Future<void> _checkIfLiked() async {
+    final isLiked = await Event.isEventLikedByUser(widget.eventId, _user!.id);
+    setState(() {
+      _isLiked = isLiked;
+    });
+  }
+
+  Future<void> _toggleLike() async {
+    try {
+      if (_isLiked) {
+        await Event.unlikeEvent(widget.eventId, _user!.id);
+      } else {
+        await Event.likeEvent(widget.eventId, _user!.id);
+      }
+      setState(() {
+        _isLiked = !_isLiked;
+      });
+    } catch (e) {
+      print('Erreur : $e');
     }
   }
 
@@ -83,6 +108,7 @@ class _EventInfosClientState extends State<EventInfosClient> {
                       fontWeight: FontWeight.bold,
                     ),
                       ),
+                      LikeBtn(isLiked: _isLiked, onTap: _toggleLike)
                     ],
                   ),
                   

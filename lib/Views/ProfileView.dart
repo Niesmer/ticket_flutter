@@ -11,9 +11,7 @@ class ProfileView extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            appBar: AppBar(
-              title: Text('Profile'),
-            ),
+            
             body: Center(
               child: CircularProgressIndicator(),
             ),
