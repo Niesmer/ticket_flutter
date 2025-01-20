@@ -2,25 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:ticket_flutter/supabase.dart';
 import 'eventListRowClient.dart';
 
-class EventListPageClient extends StatefulWidget {
-  const EventListPageClient({super.key});
+class Eventlikedlist extends StatefulWidget {
+  const Eventlikedlist({super.key});
 
   @override
-  _EventListPageClientState createState() => _EventListPageClientState();
+  _EventlikedlistState createState() => _EventlikedlistState();
 }
 
-class _EventListPageClientState extends State<EventListPageClient> {
+class _EventlikedlistState extends State<Eventlikedlist> {
   late Future<List<Event>> _futureEvents;
 
   @override
   void initState() {
     super.initState();
-    _futureEvents = Event.getAll();
+    _futureEvents = Event.getLikedEvents();
   }
 
    void _refreshEvents() {
     setState(() {
-      _futureEvents = Event.getAll(); // Refresh event list
+      _futureEvents = Event.getLikedEvents(); // Refresh event list
     });
   }
 

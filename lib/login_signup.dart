@@ -5,7 +5,7 @@ import 'package:ticket_flutter/supabase.dart';
 
 class LoginSignup extends StatefulWidget {
   const LoginSignup({super.key});
-  
+
   @override
   _LoginSignupState createState() => _LoginSignupState();
 }
@@ -43,94 +43,183 @@ class _LoginSignupState extends State<LoginSignup> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Padding( 
+      padding : EdgeInsets.symmetric(horizontal: 10, vertical: 25),
+      child : Scaffold(
+              backgroundColor: Color.fromARGB(31, 157, 192, 249),
+
       appBar: AppBar(
-        title: Text(_isLogin ? 'Login' : 'Signup'),
+        backgroundColor: Color.fromARGB(0, 0, 0, 0),
+        centerTitle: true,
+        title: Text(_isLogin ? 'SE CONNECTER' : "S'INSCRIRE",
+            
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 30,
+                color: Color.fromARGB(255, 2, 78, 218),
+                fontWeight: FontWeight.w800)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value!.isEmpty || !value.contains('@')) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _email = value!;
-                },
+              // Email Field with Padding
+              Padding(
+                padding: EdgeInsets.all(5.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty || !value.contains('@')) {
+                      return 'Veuillez entrer un email valide';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _email = value!;
+                  },
+                ),
               ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Password'),
-                onFieldSubmitted: (value) => _submit(),
-                obscureText: true,
-                validator: (value) {
-                  if (value!.isEmpty || value.length < 6) {
-                    return 'Password must be at least 6 characters long';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _password = value!;
-                },
+              // Password Field with Padding
+              Padding(
+                padding: EdgeInsets.all(5.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Mot de Passe',
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  onFieldSubmitted: (value) => _submit(),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value!.isEmpty || value.length < 6) {
+                      return 'Le Mot de passe doit contenir au moins 6 caractères';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _password = value!;
+                  },
+                ),
               ),
+              // Conditional Fields for Signup
               if (!_isLogin) ...[
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Pseudo'),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter a pseudo';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _pseudo = value!;
-                  },
+                Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Pseudo',
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Veuillez entrer un pseudo';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _pseudo = value!;
+                    },
+                  ),
                 ),
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Nom'),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter your last name';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _nom = value!;
-                  },
+                Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Nom',
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Veuillez entrer un nom';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _nom = value!;
+                    },
+                  ),
                 ),
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Prénom'),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter your first name';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _prenom = value!;
-                  },
+                Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Prénom',
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Veuillez entrer un prénom';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _prenom = value!;
+                    },
+                  ),
                 ),
               ],
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _submit,
-                child: Text(_isLogin ? 'Login' : 'Signup'),
+              // Button with Padding
+              Padding(
+                padding: EdgeInsets.all(5.0),
+                child: ElevatedButton(
+                  onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 2, 78, 218),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    minimumSize: Size(double.infinity, 50), // Button width = container width
+                  ),
+                  child: Text(_isLogin ? 'SE CONNECTER' : "S'INSCRIRE"),
+                ),
               ),
+              // Toggle Form Mode Button
               TextButton(
                 onPressed: _toggleFormMode,
                 child: Text(
-                    _isLogin ? 'Create an account' : 'Have an account? Login'),
+                    _isLogin ? 'Créer un compte' : 'Déjà inscrit ? Se Connecter', style: TextStyle(color : const Color.fromARGB(255, 108, 108, 108), )),
               ),
             ],
           ),
         ),
       ),
-    );
+    ));
   }
 }

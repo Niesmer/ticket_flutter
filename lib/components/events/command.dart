@@ -29,24 +29,27 @@ class _CommandState extends State<CommandPage> {
     _fetchEvent();
   }
 
-  Future<void> _submitOrder() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      _formKey.currentState!.save();
+  Future<bool> _submitOrder() async {
+  if (_formKey.currentState?.validate() ?? false) {
+    _formKey.currentState!.save();
 
+    setState(() {
+      _error = null;
+    });
+
+    try {
+      _seats = await getSeatNumbers(_ticketQuantity, widget.eventId);
+      return true; // Indique que la soumission a réussi
+    } catch (e) {
       setState(() {
-        _error = null;
+        _error = e.toString();
+        print(_error);
       });
-
-      try {
-        // Example API call to create a command using Supabase
-        _seats = await getSeatNumbers(_ticketQuantity, widget.eventId);
-      } catch (e) {
-        setState(() {
-          _error = e.toString();
-        });
-      }
+      return false; // Indique un échec
     }
   }
+  return false; // Indique que la validation a échoué
+}
 
   Future<void> _fetchEvent() async {
     setState(() {
@@ -105,6 +108,7 @@ class _CommandState extends State<CommandPage> {
                     ),
                     const SizedBox(height: 16),
                     if (_error != null)
+
                       Text(
                         _error!,
                         style: const TextStyle(color: Colors.red),
@@ -115,8 +119,9 @@ class _CommandState extends State<CommandPage> {
                         textStyle: const TextStyle(color: Colors.white),
                       ),
                       onPressed: () async {
-                        await _submitOrder();
-                        final confirm = await _showConfirmationDialog(
+                        bool isOrderAccepted = await _submitOrder();
+                        if (isOrderAccepted) {
+                          final confirm = await _showConfirmationDialog(
                             context, event, widget.user, _ticketQuantity);
                         if (confirm == true) {
                           // Assuming Command.createOne is defined elsewhere
@@ -125,6 +130,8 @@ class _CommandState extends State<CommandPage> {
                           Event.updateTickets(event.id, event.ticketsNbr - _ticketQuantity);
                           Navigator.pop(context, true); // Retourne à la liste
                         }
+                        }
+                        
                       },
                       child: const Text('Commander'),
                     ),

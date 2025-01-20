@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticket_flutter/components/like_btn.dart';
 import 'package:ticket_flutter/global.dart';
 import 'package:ticket_flutter/supabase.dart';
 import 'package:ticket_flutter/utils.dart';
@@ -22,12 +23,15 @@ class _EventInfosClientState extends State<EventInfosClient> {
   late Future<Event> _eventFuture;
   late UserProfile? _user;
   String? errorMessage;
+  bool _isLiked = false;
+
 
   @override
   void initState() {
     super.initState();
     _loadEvent();
     _user = currentUser;
+    _checkIfLiked();
   }
 
   void _loadEvent() {
@@ -46,8 +50,30 @@ class _EventInfosClientState extends State<EventInfosClient> {
 
     if (result == true) {
       widget
-          .onEventChanged(); // Notifie le parent que des modifications ont été faites
+          .onEventChanged(); 
       _loadEvent();
+    }
+  }
+
+  Future<void> _checkIfLiked() async {
+    final isLiked = await Event.isEventLikedByUser(widget.eventId, _user!.id);
+    setState(() {
+      _isLiked = isLiked;
+    });
+  }
+
+  Future<void> _toggleLike() async {
+    try {
+      if (_isLiked) {
+        await Event.unlikeEvent(widget.eventId, _user!.id);
+      } else {
+        await Event.likeEvent(widget.eventId, _user!.id);
+      }
+      setState(() {
+        _isLiked = !_isLiked;
+      });
+    } catch (e) {
+      print('Erreur : $e');
     }
   }
 
@@ -73,13 +99,19 @@ class _EventInfosClientState extends State<EventInfosClient> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  Row(
+                    children: [
+                      Text(
                     event.name,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
+                      ),
+                      LikeBtn(isLiked: _isLiked, onTap: _toggleLike)
+                    ],
                   ),
+                  
                   const SizedBox(height: 16),
                   Text('Lieu : ${event.location}'),
                   const SizedBox(height: 8),
@@ -107,6 +139,20 @@ class _EventInfosClientState extends State<EventInfosClient> {
                     'Fermeture Billeterie :  ${parseDate(event.closingDateTicket, event.closingTimeTicket)}',
                   ),
                   const SizedBox(height: 16),
+                   if (!validateTicketOpening(event.openingDateTicket,event.openingTimeTicket)) ...[
+                  const Text(
+                    "La billeterie n'est pas encore ouverte."
+                  ),
+                   ]
+                  else if (!validateTicketClosing(event.closingDateTicket,event.closingTimeTicket)) ...[
+                  const Text(
+                    "La billeterie est fermée"
+                  ),
+                ] else if (event.ticketsNbr <= 0) ...[
+                  const Text(
+                    "Il n'y a plus de tickets disponibles.",
+                  ),
+                ] else ...[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -117,6 +163,7 @@ class _EventInfosClientState extends State<EventInfosClient> {
                       ),
                     ],
                   ),
+                ],
                 ],
               ),
             );

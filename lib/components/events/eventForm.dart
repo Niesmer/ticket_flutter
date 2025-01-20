@@ -29,6 +29,7 @@ class _EventFormState extends State<EventForm> {
   TimeOfDay? _openingTimeTicket;
   DateTime? _closingDateTicket;
   TimeOfDay? _closingTimeTicket;
+  Event? _currentEvent;
 
   bool _isLoading = true;
 
@@ -46,7 +47,9 @@ class _EventFormState extends State<EventForm> {
     try {
       final event = await Event.getOne(widget.eventId!);
       setState(() {
+        _currentEvent = event;
         _name = event.name;
+        _price = event.price;
         _eventDateStart = event.eventDateStart;
         _eventTimeStart = event.eventTimeStart;
         _eventDateEnd = event.eventDateEnd;
@@ -97,9 +100,16 @@ class _EventFormState extends State<EventForm> {
 
   void _submitForm() async {
     _errors = [];
-    print("submited");
+    bool update;
 
+    if(_currentEvent != null ){
+       update = true;
+    }
+    else {
+      update = false;
+    }
     final newErrors = validateDates(
+      update,
       _openingDateTicket,
       _closingDateTicket,
       _openingTimeTicket,
@@ -112,11 +122,9 @@ class _EventFormState extends State<EventForm> {
 
     setState(() {
       if (_errors == null) {
-        print(_errors);
         _errors = newErrors;
       } else {
         _errors!.addAll(newErrors!);
-        print(_errors);
       }
     });
 
@@ -125,7 +133,6 @@ class _EventFormState extends State<EventForm> {
     }
 
     if (_formKey.currentState!.validate()) {
-      print("oui");
       _formKey.currentState!.save();
       if (widget.eventId != null) {
         // Mise à jour
@@ -164,8 +171,6 @@ class _EventFormState extends State<EventForm> {
       }
 
       Navigator.pop(context, true);
-    } else {
-      print("pas marché");
     }
   }
 

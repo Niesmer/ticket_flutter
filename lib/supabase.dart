@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:ticket_flutter/global.dart';
 
 class UserProfile {
   final String id; // Use the user's unique ID (UUID) from Supabase Auth
@@ -83,9 +84,11 @@ class Command {
         return false;
       }
 
-      final List<dynamic> commands = response[0] as List;
+      List<Command> commands =
+          response.map((command) => Command.fromJson(command)).toList();
+      print(commands);
       for (var command in commands) {
-        List<String> seatNumbers = List<String>.from(command['seat_nbr']);
+        List<String> seatNumbers = List<String>.from(command.seatNbr);
         if (seatNumbers.contains(seatNbr)) {
           return true;
         }
@@ -260,6 +263,71 @@ class Event {
     }).match({'id': idEvent});
   }
 
+  static Future<List<Event>> getLikedEvents() async{
+    List<int> likedIds = currentUser!.likedIds!;
+    if(likedIds == []) {
+      return [];
+    }
+    final eventsResponse = await SupaConnect()
+      .client
+      .from('Events')
+      .select()
+      .inFilter('id', likedIds);
+
+  return eventsResponse.map<Event>((event) => Event.fromJson(event)).toList();
+  }
+
+  
+  static Future<bool> isEventLikedByUser(int eventId, String userId) async {
+    final response = await SupaConnect()
+        .client
+        .from('Profiles')
+        .select('liked_events_id')
+        .eq('id', userId)
+        .single();
+    if (response['liked_events_id'] == []) {
+      return false;
+    } else {
+      List<dynamic> ids = response['liked_events_id'] as List<dynamic>;
+      return (ids.contains(eventId));
+    }
+  }
+
+  static Future<void> likeEvent(int eventId, String userId) async {
+    final response = await SupaConnect()
+        .client
+        .from('Profiles')
+        .select('liked_events_id')
+        .eq('id', userId)
+        .single();
+    print({"response : ${response['liked_events_id']}"});
+    if (response['liked_events_id'] != []) {
+      List<dynamic> ids = response['liked_events_id'] as List<dynamic>;
+      if (!ids.contains(eventId)) {
+        ids.add(eventId);
+        await SupaConnect().client.from('Profiles').update({'liked_events_id' : ids}).match({'id' : userId});
+      }
+    }
+  }
+
+  static Future<void> unlikeEvent(int eventId, String userId) async {
+    final response = await SupaConnect()
+        .client
+        .from('Profiles')
+        .select('liked_events_id')
+        .eq('id', userId)
+        .single();
+    print({"response : ${response['liked_events_id']}"});
+    if (response['liked_events_id'] != []) {
+      List<dynamic> ids = response['liked_events_id'] as List<dynamic>;
+      if (ids.contains(eventId)) {
+        ids.remove(eventId);
+        await SupaConnect().client.from('Profiles').update({'liked_events_id' : ids}).match({'id' : userId});
+
+      }
+    }
+  }
+
   // Conversion d'un JSON en objet Event
   static Event fromJson(Map<String, dynamic> json) {
     return Event(
@@ -414,7 +482,7 @@ class SupaConnect {
       nom: data['nom'],
       prenom: data['prenom'],
       role: data['role'],
-      likedIds: List<int>.from(data['likedIds'] ?? []),
+      likedIds: List<int>.from(data['liked_events_id'] ?? []),
       email: user.email ?? '',
     );
   }
