@@ -15,12 +15,17 @@ class EventListRowClient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),  // Espacement vertical
+      child: ListTile(
+      tileColor: Colors.white,
+      contentPadding: EdgeInsets.all(15),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
       title: Text('${event.name} - ${event.location}'),
       subtitle: Text(
         'Début: ${parseDate(event.eventDateStart, event.eventTimeStart)} \n'
         'Fin: ${parseDate(event.eventDateEnd, event.eventTimeEnd)}\n'
-        'Prix: ${event.price}',
+        'Prix: ${event.price}€',
       ),
       onTap: () async {
         final result = await Navigator.push(
@@ -38,6 +43,6 @@ class EventListRowClient extends StatelessWidget {
           onEventChanged();
         }
       },
-    );
+    ));
   }
 }

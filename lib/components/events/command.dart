@@ -133,7 +133,9 @@ class _CommandState extends State<CommandPage> {
                         }
                         
                       },
+                      
                       child: const Text('Commander'),
+                      
                     ),
                   ],
                 ),

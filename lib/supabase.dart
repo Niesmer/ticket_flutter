@@ -48,6 +48,7 @@ class Command {
         .from('Command')
         .select()
         .eq('id_event', idEvent);
+        print(data);
     return Future.wait(
         data.map((cmd) => Command.fromJsonWithUser(cmd)).toList());
   }

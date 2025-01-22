@@ -25,7 +25,6 @@ class _EventInfosClientState extends State<EventInfosClient> {
   String? errorMessage;
   bool _isLiked = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -49,8 +48,7 @@ class _EventInfosClientState extends State<EventInfosClient> {
     );
 
     if (result == true) {
-      widget
-          .onEventChanged(); 
+      widget.onEventChanged();
       _loadEvent();
     }
   }
@@ -80,9 +78,7 @@ class _EventInfosClientState extends State<EventInfosClient> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Détails de l\'événement'),
-      ),
+      appBar: AppBar(),
       body: FutureBuilder<Event>(
         future: _eventFuture,
         builder: (BuildContext context, AsyncSnapshot<Event> snapshot) {
@@ -95,75 +91,94 @@ class _EventInfosClientState extends State<EventInfosClient> {
           } else {
             final event = snapshot.data!;
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                    event.name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            event.name,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          LikeBtn(isLiked: _isLiked, onTap: _toggleLike)
+                        ]),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text('Lieu : ${event.location}')),
+                  Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Début : ${parseDate(event.eventDateStart, event.eventTimeStart)}',
+                      )),
+                  Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Fin :  ${parseDate(event.eventDateEnd, event.eventTimeEnd)}',
+                      )),
+                  Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Prix : ${event.price} €',
+                      )),
+                  Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Ouverture Billeterie : ${parseDate(event.openingDateTicket, event.openingTimeTicket)}',
+                      )),
+                  Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Fermeture Billeterie :  ${parseDate(event.closingDateTicket, event.closingTimeTicket)}',
+                      )),
+                  if (!validateTicketOpening(
+                      event.openingDateTicket, event.openingTimeTicket)) ...[
+                    const Text(
+                      "La billeterie n'est pas encore ouverte.",
+                      textAlign: TextAlign.center,
                     ),
-                      ),
-                      LikeBtn(isLiked: _isLiked, onTap: _toggleLike)
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  Text('Lieu : ${event.location}'),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Début : ${parseDate(event.eventDateStart, event.eventTimeStart)}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Fin :  ${parseDate(event.eventDateEnd, event.eventTimeEnd)}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Billets disponibles : ${event.ticketsNbr}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Prix : ${event.price}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Ouverture Billeterie : ${parseDate(event.openingDateTicket, event.openingTimeTicket)}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Fermeture Billeterie :  ${parseDate(event.closingDateTicket, event.closingTimeTicket)}',
-                  ),
-                  const SizedBox(height: 16),
-                   if (!validateTicketOpening(event.openingDateTicket,event.openingTimeTicket)) ...[
-                  const Text(
-                    "La billeterie n'est pas encore ouverte."
-                  ),
-                   ]
-                  else if (!validateTicketClosing(event.closingDateTicket,event.closingTimeTicket)) ...[
-                  const Text(
-                    "La billeterie est fermée"
-                  ),
-                ] else if (event.ticketsNbr <= 0) ...[
-                  const Text(
-                    "Il n'y a plus de tickets disponibles.",
-                  ),
-                ] else ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: _onCommand,
-                        icon: const Icon(Icons.edit),
-                        label: const Text('Commander'),
-                      ),
-                    ],
-                  ),
-                ],
+                  ] else if (!validateTicketClosing(
+                      event.closingDateTicket, event.closingTimeTicket)) ...[
+                    const Text(
+                      "La billeterie est fermée",
+                      textAlign: TextAlign.center,
+                    ),
+                  ] else if (event.ticketsNbr <= 0) ...[
+                    const Text(
+                      "Il n'y a plus de tickets disponibles.",
+                      textAlign: TextAlign.center,
+                    ),
+                  ] else ...[
+                    
+                      
+                        Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: (ElevatedButton.icon(
+                              onPressed: _onCommand,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Color.fromARGB(255, 2, 78, 218),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                minimumSize: Size(double.infinity,
+                                    50),
+                              ),
+                              icon: const Icon(Icons.book_online),
+                              label: const Text('Commander'),
+                            )
+                            )
+                            ),
+                     
+                  ],
                 ],
               ),
             );
