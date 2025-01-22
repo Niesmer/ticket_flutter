@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ticket_flutter/Views/AdminEventView.dart';
 import 'package:ticket_flutter/Views/CommandListUserView.dart';
 import 'package:ticket_flutter/Views/HomeView.dart';
+import 'package:ticket_flutter/Views/LikeEventView.dart';
 import 'package:ticket_flutter/Views/LoginView.dart';
 import 'package:ticket_flutter/Views/ProfileView.dart';
 import 'package:ticket_flutter/components/events/eventListPage.dart';
@@ -96,6 +97,8 @@ class _MyAppState extends State<MyApp> {
                   return ProfileView();
                 case 'Admin Event':
                   return Admineventview();
+                case 'Mes likes':
+                  return LikedEventView();
                 case 'Mes commandes':
                   return CommandListUserView();
                 default:

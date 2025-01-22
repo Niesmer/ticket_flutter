@@ -10,7 +10,7 @@ class EventListRowClient extends StatelessWidget {
   const EventListRowClient({
     super.key,
     required this.event,
-    required this.onEventChanged,
+    required this.onEventChanged, void Function()? onRefresh,
   });
 
   @override
