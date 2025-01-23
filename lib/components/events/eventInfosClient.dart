@@ -138,23 +138,27 @@ class _EventInfosClientState extends State<EventInfosClient> {
                       child: Text(
                         'Fermeture Billeterie :  ${parseDate(event.closingDateTicket, event.closingTimeTicket)}',
                       )),
+                  
+                  
                   if (!validateTicketOpening(
                       event.openingDateTicket, event.openingTimeTicket)) ...[
-                    const Text(
+                    const Center( 
+        
+                      child: Text(
                       "La billeterie n'est pas encore ouverte.",
                       textAlign: TextAlign.center,
-                    ),
+                    )),
                   ] else if (!validateTicketClosing(
                       event.closingDateTicket, event.closingTimeTicket)) ...[
-                    const Text(
+                    const Center(child: Text(
                       "La billeterie est fermée",
                       textAlign: TextAlign.center,
-                    ),
+                    )),
                   ] else if (event.ticketsNbr <= 0) ...[
-                    const Text(
+                    const Center( child: Text(
                       "Il n'y a plus de tickets disponibles.",
                       textAlign: TextAlign.center,
-                    ),
+                    )),
                   ] else ...[
                     
                       

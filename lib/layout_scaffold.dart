@@ -19,8 +19,11 @@ class LayoutScaffold extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: navigationShell.goBranch,
-        indicatorColor: Theme.of(context).primaryColor,
-        backgroundColor: Color.fromARGB(255, 157, 192, 249),
+       indicatorColor: Theme.of(context).primaryColor, // Couleur de l'indicateur
+  backgroundColor: Colors.transparent, // Fond transparent
+  surfaceTintColor: Colors.transparent, // Assurez-vous que la teinte est désactivée
+  shadowColor: Colors.transparent, // Supprimez l'ombre
+        
         destinations: dest
             .map((dest) => NavigationDestination(
                   icon: Icon(dest.icon),

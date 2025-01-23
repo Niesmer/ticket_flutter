@@ -21,38 +21,53 @@ String parseDateOnly(DateTime date) {
   return '$day/$month/$year';
 }
 
-bool validateTicketOpening(openingDateTicket, openingTimeTicket){
+bool validateTicketOpening(DateTime? openingDateTicket, TimeOfDay? openingTimeTicket) {
   final now = DateTime.now();
   final currentDate = DateTime(now.year, now.month, now.day);
-  final currentTime = TimeOfDay(hour : now.hour, minute : now.minute);
-
-   if (openingDateTicket != null && currentDate.isBefore(openingDateTicket)) {
-    return false;
-  } else if (openingDateTicket == currentDate && openingTimeTicket != null) {
-    if (!_isTimeBefore(currentTime, openingTimeTicket)) {
+  final currentTime = TimeOfDay(hour: now.hour, minute: now.minute);
+  
+  if (openingDateTicket != null) {
+    final ticketDate = DateTime(openingDateTicket.year, openingDateTicket.month, openingDateTicket.day);
+   
+    if (ticketDate.isAfter(currentDate)) {
       return false;
-    }
-  }
-  return true;
-}
-bool validateTicketClosing(closingDateTicket, closingTimeTicket){
-  final now = DateTime.now();
-  final currentDate = DateTime(now.year, now.month, now.day);
-  final currentTime = TimeOfDay(hour : now.hour, minute : now.minute);
-
-  if (closingDateTicket != null && currentDate.isAfter(closingDateTicket)) {
-    return false;
-  } else if (closingDateTicket == currentDate && closingTimeTicket != null) {
-    if (!_isTimeBefore(closingTimeTicket, currentTime)) {
-      return false;
+    } else if (ticketDate.isAtSameMomentAs(currentDate) && openingTimeTicket != null) {
+     
+      if (_isTimeBefore(currentTime, openingTimeTicket)) {
+        return false;
+      }
     }
   }
   return true;
 }
 
-bool _isTimeBefore(TimeOfDay a, TimeOfDay b) {
-  return a.hour < b.hour || (a.hour == b.hour && a.minute < b.minute);
+bool validateTicketClosing(DateTime? closingDateTicket, TimeOfDay? closingTimeTicket) {
+  final now = DateTime.now();
+  print(now);
+  final currentDate = DateTime(now.year, now.month, now.day);
+  final currentTime = TimeOfDay(hour: now.hour, minute: now.minute);
+
+  if (closingDateTicket != null) {
+    final ticketDate = DateTime(closingDateTicket.year, closingDateTicket.month, closingDateTicket.day);
+    if (currentDate.isAfter(ticketDate)) {
+      return false;
+    } else if (ticketDate.isAtSameMomentAs(currentDate) && closingTimeTicket != null) {
+      if (!_isTimeBefore(closingTimeTicket, currentTime)) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
+
+bool _isTimeBefore(TimeOfDay time1, TimeOfDay time2) {
+  final totalMinutes1 = time1.hour * 60 + time1.minute;
+  print(totalMinutes1);
+  final totalMinutes2 = time2.hour * 60 + time2.minute;
+  print(totalMinutes2);
+  return totalMinutes1 < totalMinutes2;
+}
+
 
 List<String>? validateDates(
     update,
