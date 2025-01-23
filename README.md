@@ -24,6 +24,13 @@ Ce projet est un point de départ pour une application Flutter.
    ```
 4. Ouvrez le projet dans votre éditeur de code préféré.
 
+### Installation des dépendances
+
+1. À la racine du projet, exécutez la commande suivante pour installer toutes les dépendances :
+   ```sh
+   flutter pub get
+   ```
+
 ### Exécution de l'application
 
 1. Assurez-vous d'avoir un appareil connecté ou un émulateur en cours d'exécution.
