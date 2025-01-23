@@ -10,7 +10,7 @@ class Destination {
 final List<Destination> destinations = [
   Destination(label: "Acceuil", icon: Icons.home),
   Destination(label: "Mes commandes", icon: Icons.list_alt),
-  Destination(label: "Mes likes", icon: Icons.list_alt),
+  Destination(label: "Mes likes", icon: Icons.favorite_border_rounded),
   Destination(label: "Profil", icon: Icons.person)
 ];
 
