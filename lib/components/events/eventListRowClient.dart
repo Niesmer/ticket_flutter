@@ -5,12 +5,12 @@ import 'package:ticket_flutter/utils.dart';
 
 class EventListRowClient extends StatelessWidget {
   final Event event;
-  final VoidCallback onEventChanged;
+  final VoidCallback? onEventChanged;
 
   const EventListRowClient({
     super.key,
     required this.event,
-    required this.onEventChanged, void Function()? onRefresh,
+    this.onEventChanged,
   });
 
   @override
@@ -28,14 +28,13 @@ class EventListRowClient extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => EventInfosClient(
               eventId: event.id,
-              onEventChanged: onEventChanged, // Transmet le callback
+              onEventChanged: onEventChanged ?? () {}, // Transmet le callback
             ),
           ),
         );
 
         // Si les modifications ont été effectuées dans EventInfos, appelle le callback
         if (result == true) {
-          onEventChanged();
         }
       },
     );

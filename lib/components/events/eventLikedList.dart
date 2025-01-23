@@ -3,7 +3,8 @@ import 'package:ticket_flutter/supabase.dart';
 import 'eventListRowClient.dart';
 
 class Eventlikedlist extends StatefulWidget {
-  const Eventlikedlist({super.key});
+  final List<Event> events;
+  const Eventlikedlist({super.key, required this.events});
 
   @override
   _EventlikedlistState createState() => _EventlikedlistState();
@@ -17,13 +18,6 @@ class _EventlikedlistState extends State<Eventlikedlist> {
     super.initState();
     _futureEvents = Event.getLikedEvents();
   }
-
-   void _refreshEvents() {
-    setState(() {
-      _futureEvents = Event.getLikedEvents(); // Refresh event list
-    });
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +36,15 @@ class _EventlikedlistState extends State<Eventlikedlist> {
             return Center(child: Text('Aucun événement trouvé.'));
           } else {
             final events = snapshot.data!;
-             return ListView.builder(
+            return ListView.builder(
               itemCount: events.length,
               itemBuilder: (context, index) {
-                if (events[index].state == 0){
+                if (events[index].state == 0) {
                   return EventListRowClient(
-                  event: events[index],
-                  onEventChanged: _refreshEvents, // Callback to refresh list
-                );
+                    event: events[index],
+                  );
                 }
                 return null;
-                
               },
             );
           }
@@ -60,6 +52,4 @@ class _EventlikedlistState extends State<Eventlikedlist> {
       ),
     );
   }
-
-  
 }

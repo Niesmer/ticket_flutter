@@ -109,9 +109,7 @@ class Command {
   }
 
   static Future<Command> fromJsonWithUser(Map<String, dynamic> json) async {
-    print(json['id_user']);
     final user = await SupaConnect().getUserById(json['id_user']);
-    print(user);
     return Command(
         id: json['id'] as int,
         idEvent: json['id_event'] as int,
@@ -299,7 +297,6 @@ class Event {
         .select('liked_events_id')
         .eq('id', userId)
         .single();
-    print({"response : ${response['liked_events_id']}"});
     if (response['liked_events_id'] != []) {
       List<dynamic> ids = response['liked_events_id'] as List<dynamic>;
 
