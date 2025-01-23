@@ -13,10 +13,17 @@ class LayoutScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
+      backgroundColor: Colors.transparent,
+      drawerScrimColor: Colors.transparent,
+
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: navigationShell.goBranch,
-        indicatorColor: Theme.of(context).primaryColor,
+       indicatorColor: Theme.of(context).primaryColor, // Couleur de l'indicateur
+  backgroundColor: Colors.transparent, // Fond transparent
+  surfaceTintColor: Colors.transparent, // Assurez-vous que la teinte est désactivée
+  shadowColor: Colors.transparent, // Supprimez l'ombre
+        
         destinations: dest
             .map((dest) => NavigationDestination(
                   icon: Icon(dest.icon),

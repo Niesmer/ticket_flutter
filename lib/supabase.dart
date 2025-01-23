@@ -48,6 +48,7 @@ class Command {
         .from('Command')
         .select()
         .eq('id_event', idEvent);
+        print(data);
     return Future.wait(
         data.map((cmd) => Command.fromJsonWithUser(cmd)).toList());
   }
@@ -217,8 +218,38 @@ class Event {
   }
 
   static Future<void> deleteOne(int id) async {
-    await SupaConnect().client.from('Events').delete().match({'id': id});
-  }
+  
+    final response = await SupaConnect()
+        .client
+        .from('Profiles')
+        .select('id, liked_events_id');
+
+    final List<dynamic> users = response as List<dynamic>;
+    for (var user in users) {
+      final List<dynamic> likedEvents = List.from(user['liked_events_id'] ?? []);
+      if (likedEvents.contains(id)) {
+        likedEvents.remove(id);
+
+        final updateResponse = await SupaConnect()
+            .client
+            .from('Profiles')
+            .update({'liked_events_id': likedEvents})
+            .eq('id', user['id']);
+
+       
+      }
+    }
+    final deleteResponse = await SupaConnect()
+        .client
+        .from('Events')
+        .delete()
+        .eq('id', id);
+
+    
+
+    print('Événement avec ID $id supprimé avec succès.');
+
+}
 
   static Future<Event> updateOne(
     int id,

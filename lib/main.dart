@@ -69,9 +69,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     if (!_isLoggedIn) {
       return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Ticket flutter',
+        color: Colors.transparent,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 2, 78, 218)),
+          scaffoldBackgroundColor: Colors.transparent,
           useMaterial3: true,
         ),
         home: LoginView(),
@@ -114,6 +116,7 @@ class _MyAppState extends State<MyApp> {
       routes: [
         StatefulShellRoute.indexedStack(
             builder: (context, state, navigationShell) => LayoutScaffold(
+            
                   navigationShell: navigationShell,
                   dest: dest,
                 ),
@@ -143,10 +146,13 @@ class _MyAppState extends State<MyApp> {
     );
 
     return MaterialApp.router(
-      title: 'Flutter Demo',
+      title: 'Ticket Flutter',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 2, 78, 218)),
         useMaterial3: true,
+        canvasColor: Colors.transparent,
+        bottomAppBarTheme: BottomAppBarTheme(surfaceTintColor: Colors.transparent, shadowColor: Colors.transparent, color: Colors.transparent)
       ),
       routerConfig: router,
     );

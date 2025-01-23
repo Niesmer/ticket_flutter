@@ -25,7 +25,7 @@ class LikeBtn extends StatelessWidget {
       },
       child: Icon(
         isLiked ? Icons.favorite : Icons.favorite_border,
-        color: isLiked ? Colors.red : Colors.grey,
+        color: isLiked ? Color.fromARGB(255, 2, 78, 218) : Colors.grey,
       ),
     );
   }

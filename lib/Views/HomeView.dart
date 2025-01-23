@@ -6,9 +6,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Home View'),
-      ),
+      backgroundColor: Color.fromARGB(255, 157, 192, 249),
       body: EventListPageClient()
     );
   }

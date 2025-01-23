@@ -7,9 +7,8 @@ class CommandListUserView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Command List'),
-      ),
+               backgroundColor: Color.fromARGB(255, 157, 192, 249),
+
       body: CommandListUser(),
     );
   }

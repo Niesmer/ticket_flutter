@@ -15,7 +15,13 @@ class EventListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),  // Espacement vertical
+      child: ListTile(
+      contentPadding: EdgeInsets.all(10),
+      tileColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+
       title: Text('${event.name} - ${event.location}'),
       subtitle: Text(
         'Début: ${parseDate(event.eventDateStart, event.eventTimeStart)} \n'
@@ -38,6 +44,6 @@ class EventListRow extends StatelessWidget {
           onEventChanged();
         }
       },
-    );
+    ));
   }
 }

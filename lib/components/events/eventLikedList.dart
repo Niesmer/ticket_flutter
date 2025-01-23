@@ -21,10 +21,23 @@ class _EventlikedlistState extends State<Eventlikedlist> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Liste des événements'),
-      ),
+    return Padding(
+        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: Scaffold(
+          backgroundColor: Color.fromARGB(255, 157, 192, 249),
+          appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 157, 192, 249),
+                shadowColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                centerTitle: true,
+                title: Padding(
+              padding: EdgeInsets.fromLTRB(0, 30, 0, 20),
+              child: Text('LISTE DE VOS LIKES',textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 30,
+                        color: Color.fromARGB(255, 2, 78, 218),
+                        fontWeight: FontWeight.w800),)
+      )),
       body: FutureBuilder<List<Event>>(
         future: _futureEvents,
         builder: (context, snapshot) {
@@ -36,7 +49,9 @@ class _EventlikedlistState extends State<Eventlikedlist> {
             return Center(child: Text('Aucun événement trouvé.'));
           } else {
             final events = snapshot.data!;
-            return ListView.builder(
+             return Padding(
+                    padding: EdgeInsets.fromLTRB(30, 25, 30, 0),
+                    child:  ListView.builder(
               itemCount: events.length,
               itemBuilder: (context, index) {
                 if (events[index].state == 0) {
@@ -46,10 +61,10 @@ class _EventlikedlistState extends State<Eventlikedlist> {
                 }
                 return null;
               },
-            );
+            ));
           }
         },
       ),
-    );
+    ));
   }
 }

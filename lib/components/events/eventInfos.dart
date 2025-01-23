@@ -67,7 +67,6 @@ class _EventInfosState extends State<EventInfos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Détails de l\'événement'),
       ),
       body: FutureBuilder<Event>(
         future: _eventFuture,
@@ -81,61 +80,110 @@ class _EventInfosState extends State<EventInfos> {
           } else {
             final event = snapshot.data!;
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    event.name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Lieu : ${event.location}'),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Début : ${parseDate(event.eventDateStart, event.eventTimeStart)}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Fin :  ${parseDate(event.eventDateEnd, event.eventTimeEnd)}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Billets disponibles : ${event.ticketsNbr}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Prix : ${event.price}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Ouverture Billeterie : ${parseDate(event.openingDateTicket, event.openingTimeTicket)}',
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Fermeture Billeterie :  ${parseDate(event.closingDateTicket, event.closingTimeTicket)}',
-                  ),
-                  const SizedBox(height: 16),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [ Text(
+                    event.name,
+                     style: TextStyle(
+                        fontSize: 30,
+                        color: Color.fromARGB(255, 2, 78, 218),
+                        fontWeight: FontWeight.w800)),],
+                  ),
+                 
+              
+                  
+
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child:
+                  Text('Lieu : ${event.location}')),
+                  Padding(
+                  
+                  
+                    padding: EdgeInsets.all(8),
+                    child:Text(  'Début : ${parseDate(event.eventDateStart, event.eventTimeStart)}',
+                  )),
+                   Padding(
+                  
+                 
+                    padding: EdgeInsets.all(8),
+                    child: Text( 'Fin :  ${parseDate(event.eventDateEnd, event.eventTimeEnd)}',
+                  )),
+                  
+                  
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Text( 'Billets disponibles : ${event.ticketsNbr}',
+                  )),
+                  
+                  
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child:Text(  'Prix : ${event.price} €',
+                  )),
+                  
+                  
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Text( 'Ouverture Billeterie : ${parseDate(event.openingDateTicket, event.openingTimeTicket)}',
+                  )),
+                  
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child:Text(
+                    'Fermeture Billeterie :  ${parseDate(event.closingDateTicket, event.closingTimeTicket)}',
+                  )),
+                  
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      Padding(
+                padding: EdgeInsets.all(5.0),
+                child: (
                       ElevatedButton.icon(
                         onPressed: _seeComands,
+                        style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 2, 78, 218),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    minimumSize: Size(double.infinity, 50), // Button width = container width
+                  ),
                         icon: const Icon(Icons.remove_red_eye),
                         label: const Text('Voir les commandes'),
-                      ),
-                      ElevatedButton.icon(
+                ))),
+                       Padding(
+                padding: EdgeInsets.all(5.0),
+                child: ElevatedButton.icon(
                         onPressed: _onEditEvent,
+                         style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 2, 78, 218),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    minimumSize: Size(double.infinity, 50), // Button width = container width
+                  ),
                         icon: const Icon(Icons.edit),
                         label: const Text('Modifier'),
-                      ),
+                      )),
+                       Padding(
+                padding: EdgeInsets.all(5.0),
+                child: 
                       ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            textStyle: TextStyle(color: Colors.white)),
+                         style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    minimumSize: Size(double.infinity, 50), // Button width = container width
+                  ),
                         onPressed: () async {
                           final confirm =
                               await _showConfirmationDialog(context);
@@ -148,7 +196,7 @@ class _EventInfosState extends State<EventInfos> {
                         },
                         icon: const Icon(Icons.delete),
                         label: const Text('Supprimer'),
-                      ),
+                      )),
                     ],
                   ),
                 ],
@@ -174,6 +222,12 @@ class _EventInfosState extends State<EventInfos> {
               child: const Text('Annuler'),
             ),
             TextButton(
+              style: TextButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),),
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text('Supprimer'),
             ),

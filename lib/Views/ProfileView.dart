@@ -11,7 +11,6 @@ class ProfileView extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            
             body: Center(
               child: CircularProgressIndicator(),
             ),
@@ -28,10 +27,10 @@ class ProfileView extends StatelessWidget {
         } else {
           UserProfile user = snapshot.data!;
           return Scaffold(
-            appBar: AppBar(
-              title: Text('Profile'),
-            ),
+            backgroundColor: Colors.white,
             body: Center(
+                child: Padding(
+              padding: EdgeInsets.all(20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -58,11 +57,20 @@ class ProfileView extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () => SupaConnect().signOut(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 151, 153, 157),
+                      foregroundColor: const Color.fromARGB(255, 45, 45, 45),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      minimumSize: Size(double.infinity,
+                          50), // Button width = container width
+                    ),
                     child: Text('Logout'),
                   ),
                 ],
               ),
-            ),
+            )),
           );
         }
       },

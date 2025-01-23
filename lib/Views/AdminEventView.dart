@@ -8,9 +8,8 @@ class Admineventview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Your Events Administation'),
-      ),
+                backgroundColor: Color.fromARGB(255, 157, 192, 249),
+
       body: EventListPage()
     );
   }
