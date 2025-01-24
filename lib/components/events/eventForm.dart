@@ -390,9 +390,9 @@ textColor: Colors.white,
                     style: ElevatedButton.styleFrom(
                         backgroundColor:
                             const Color.fromARGB(255, 141, 150, 199),
-                        textStyle: const TextStyle(color: Colors.white)),
+                        ),
                     child:
-                        Text(widget.eventId != null ? 'Modifier' : 'Ajouter'),
+                        Text(widget.eventId != null ? 'Modifier' : 'Ajouter', style: const TextStyle(color: Colors.white)),
                   ),
                   ElevatedButton(
                     onPressed: _closeForm,
