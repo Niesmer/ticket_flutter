@@ -1,66 +1,57 @@
 # ticket_flutter
 
-Un nouveau projet Flutter.
+Application mobile Flutter pour la gestion et l’achat de billets d’événements, connectée à Supabase.
 
-## Pour commencer
+## Objectif du projet
 
-Ce projet est un point de départ pour une application Flutter.
+`ticket_flutter` est une application Flutter qui permet de :
+- **consulter des événements** (nom, dates/heures, lieu, prix, nombre de billets, période d’ouverture/fermeture de la billetterie),
+- **gérer des profils utilisateurs** (pseudo, nom/prénom, rôle, email, favoris/likes),
+- **réserver/acheter des places** pour un événement (ex. numéro de siège) via des commandes.
 
-### Prérequis
+Le backend (données + accès) est fourni par **Supabase** via des tables (ex. `Profiles`, `Events`, `Command`).
 
-- [Flutter](https://flutter.dev/docs/get-started/install) installé sur votre machine.
-- Un éditeur de code comme [Visual Studio Code](https://code.visualstudio.com/) ou [Android Studio](https://developer.android.com/studio).
+## Fonctionnalités (selon le modèle de données)
 
-### Création de l'application Flutter
+- **Événements**
+  - Liste et détails d’un événement (prix, dates/heures, localisation, stock de billets, fenêtre de vente).
+- **Comptes / profils**
+  - Informations utilisateur (pseudo, identité, rôle, email).
+  - Gestion d’éléments “likés” (ex. `likedIds`).
+- **Billetterie**
+  - Création de commandes/réservations liées à un utilisateur et un événement (ex. `seat_nbr`).
 
-1. Ouvrez votre terminal ou invite de commande.
-2. Exécutez la commande suivante pour créer un nouveau projet Flutter :
-   ```sh
-   flutter create ticket_flutter
-   ```
-3. Accédez au répertoire du projet :
-   ```sh
-   cd ticket_flutter
-   ```
-4. Ouvrez le projet dans votre éditeur de code préféré.
+## Prérequis
 
-### Installation des dépendances
+- [Flutter](https://flutter.dev/docs/get-started/install)
+- Un IDE (ex. [Visual Studio Code](https://code.visualstudio.com/) ou [Android Studio](https://developer.android.com/studio))
 
-1. À la racine du projet, exécutez la commande suivante pour installer toutes les dépendances :
+## Installation
+
+1. Installer les dépendances :
    ```sh
    flutter pub get
-   ```
-
-### Exécution de l'application
-
-1. Assurez-vous d'avoir un appareil connecté ou un émulateur en cours d'exécution.
-2. Exécutez la commande suivante pour démarrer l'application :
+2. Lancer l’application (avec un appareil ou un émulateur) :
    ```sh
-   flutter run
-   ```
+    flutter run
 
-### Configuration de Supabase
+3. Configuration Supabase
 
-Pour utiliser ce projet, vous devez configurer une table Supabase. Suivez ces étapes :
-
-1. Allez sur [Supabase](https://supabase.io/) et inscrivez-vous pour un compte.
-2. Créez un nouveau projet dans le tableau de bord Supabase.
-3. Accédez à l'éditeur de tables ("Table Editor") et créez les tables nécessaires avec les colonnes appropriées pour votre application :
-   - **Profiles** : id, pseudo, nom, prenom, role, likedIds, email
-   - **Command** : id, id_event, id_user, seat_nbr
-   - **Events** : id, price, name, event_date_start, event_date_end, event_time_start, event_time_end, location, tickets_nbr, opening_date_ticket, opening_time_ticket, closing_date_ticket, closing_time_ticket, state, created_by
-4. Copiez l'URL de l'API et la clé anonyme depuis les paramètres du projet Supabase.
-5. Ajoutez ces valeurs au fichier de configuration de votre projet Flutter.
-
-Pour des instructions plus détaillées, consultez la [documentation Supabase](https://supabase.io/docs).
-
-## Ressources supplémentaires
-
-Quelques ressources pour vous aider à démarrer si c'est votre premier projet Flutter :
-
-- [Lab: Écrivez votre première application Flutter](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Exemples utiles Flutter](https://docs.flutter.dev/cookbook)
-
-Pour obtenir de l'aide sur le démarrage avec le développement Flutter, consultez la
-[documentation en ligne](https://docs.flutter.dev/), qui propose des tutoriels,
-des exemples, des conseils sur le développement mobile et une référence complète de l'API.
+   L’application s’appuie sur Supabase pour stocker et récupérer les données.
+   
+   Créez un projet sur Supabase.
+   
+   Dans Table Editor, créez les tables nécessaires, par exemple :
+      - **Profiles** : id, pseudo, nom, prenom, role, likedIds, email
+      - **Command** : id, id_event, id_user, seat_nbr
+      - **Events** : id, price, name, event_date_start, event_date_end, event_time_start, event_time_end, location, tickets_nbr, opening_date_ticket, opening_time_ticket, closing_date_ticket, etc.
+   
+   Pour plus d'information sur les attendus Supabase du projet regarder le fichier [supabase.dart](https://github.com/Niesmer/ticket_flutter/blob/main/lib/supabase.dart)
+   
+   Récupérez l’URL du projet et la Anon Key dans les paramètres Supabase.
+   
+   Ajoutez ces valeurs dans la configuration de l’app Flutter (fichier/variables de config utilisés par le projet).
+   
+   Remarque : le schéma exact des colonnes et les règles (RLS/policies) doivent être alignés avec la logique attendue par l’application.
+   
+   Documentation : [Supabase Docs](https://supabase.com/docs)
